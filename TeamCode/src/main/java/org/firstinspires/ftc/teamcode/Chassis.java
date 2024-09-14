@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-public class Chassis extends RobotComponents {
+public class Chassis extends RobotComponent {
 
     public enum SpeedMode { SLOW, NORMAL, FAST }
 
