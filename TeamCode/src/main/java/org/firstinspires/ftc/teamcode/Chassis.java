@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-public class Chassis {
+public class Chassis extends RobotComponents {
 
     public enum SpeedMode { SLOW, NORMAL, FAST }
 
@@ -26,7 +26,7 @@ public class Chassis {
         return;
     }
 
-    public void updateChassisState(Gamepad gamepad) {
+    public void updateState(Gamepad gamepad,Gamepad gamepad2) {
         SpeedMode selectedSpeedMode = SpeedMode.NORMAL;
         double lateral = gamepad.left_stick_x;
         double forward = gamepad.left_stick_y;
