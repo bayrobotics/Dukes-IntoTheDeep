@@ -2,15 +2,19 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Chassis extends RobotComponent {
+
+    public Telemetry telemetry;
 
     public enum SpeedMode { SLOW, NORMAL, FAST }
 
     public Chassis(DcMotor frontLeftMotor, DcMotor.Direction frontLeftDirection,
                    DcMotor frontRightMotor, DcMotor.Direction frontRightDirection,
                    DcMotor backRightMotor, DcMotor.Direction backRightDirection,
-                   DcMotor backLeftMotor, DcMotor.Direction backLeftDirection) {
+                   DcMotor backLeftMotor, DcMotor.Direction backLeftDirection,
+                   Telemetry telemetry) {
         this.frontLeftMotor = frontLeftMotor;
         initMotor(this.frontLeftMotor, frontLeftDirection);
 
@@ -23,6 +27,7 @@ public class Chassis extends RobotComponent {
         this.backLeftMotor = backLeftMotor;
         initMotor(this.backLeftMotor, backLeftDirection);
 
+        this.telemetry = telemetry;
         return;
     }
 
@@ -103,19 +108,18 @@ public class Chassis extends RobotComponent {
     }
 
     private DcMotor frontLeftMotor, frontRightMotor, backRightMotor, backLeftMotor;
-    private double speedMultiplier = 0.0;
+    private double speedMultiplier = 1.0;
     private double frontLeftPower = 0.0;
     private double frontRightPower = 0.0;
     private double backRightPower = 0.0;
     private double backLeftPower = 0.0;
     private int count = 0;
+    private double distanceMultiplier = 44;
+    private double sidewaysMultiplier = 100;
+    private double degreesMultiplier = 7;
+    private double motorPower = 0;
 
-    private void initMotor(DcMotor motor, DcMotor.Direction motorDirection) {
-        motor.setDirection(motorDirection);
-        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        return;
-    }
+
 
     private void setFrontLeftPower() {
         this.frontLeftMotor.setPower(this.frontLeftPower * this.speedMultiplier);
@@ -135,5 +139,152 @@ public class Chassis extends RobotComponent {
     private void setBackLeftPower() {
         this.backLeftMotor.setPower(this.backLeftPower * this.speedMultiplier);
         return;
+    }
+    public void moveForward(int inches) {
+        double frontLeftDistance = inches * distanceMultiplier;
+
+        this.runForwardPower(frontLeftDistance);
+    }
+
+    public void moveRight(int inches) {
+        double frontRightDistance = inches * sidewaysMultiplier;
+
+        this.runStrafePower(frontRightDistance);
+    }
+
+    public void rotate(double degrees) {
+
+        double backRightDistance = degrees * degreesMultiplier;
+
+        telemetry.addData("motorSpeed: ", motorPower);
+        telemetry.update();
+
+        if (backRightDistance > 0) {
+            runRightRotate(Math.abs(backRightDistance));
+        }
+        else if (backRightDistance < 0) {
+            runLeftRotate(Math.abs(backRightDistance));
+        }
+        else return;
+    }
+
+    private void initMotor(DcMotor motor, DcMotor.Direction motorDirection) {
+        motor.setDirection(motorDirection);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        return;
+    }
+
+    private void runForwardPower(double distance) {
+        this.frontLeftMotor.setTargetPosition((int) distance + frontLeftMotor.getCurrentPosition());
+        frontLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        frontLeftMotor.setPower(motorPower);
+        frontRightMotor.setPower(motorPower);
+        backLeftMotor.setPower(motorPower);
+        backRightMotor.setPower(motorPower);
+
+        while(frontLeftMotor.isBusy())
+        {
+            frontLeftMotor.setPower(motorPower);
+            frontRightMotor.setPower(motorPower);
+            backLeftMotor.setPower(motorPower);
+            backRightMotor.setPower(motorPower);
+        }
+
+        frontLeftMotor.setPower(0.0);
+        frontRightMotor.setPower(0.0);
+        backLeftMotor.setPower(0.0);
+        backRightMotor.setPower(0.0);
+
+        frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        return;
+    }
+
+    private void runStrafePower(double distance) {
+        this.frontRightMotor.setTargetPosition((int) distance + frontLeftMotor.getCurrentPosition());
+        frontRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            frontLeftMotor.setPower(-motorPower);
+            frontRightMotor.setPower(motorPower);
+            backLeftMotor.setPower(motorPower);
+            backRightMotor.setPower(-motorPower);
+
+        while(frontRightMotor.isBusy())
+        {
+            frontLeftMotor.setPower(-motorPower);
+            frontRightMotor.setPower(motorPower);
+            backLeftMotor.setPower(motorPower);
+            backRightMotor.setPower( -motorPower);
+        }
+
+
+        frontLeftMotor.setPower(0.0);
+        frontRightMotor.setPower(0.0);
+        backLeftMotor.setPower(0.0);
+        backRightMotor.setPower(0.0);
+
+        frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        return;
+    }
+
+    private void runLeftRotate(double distance) {
+        this.backRightMotor.setTargetPosition((int) distance + backRightMotor.getCurrentPosition());
+        backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        frontLeftMotor.setPower(motorPower);
+        frontRightMotor.setPower(motorPower);
+        backLeftMotor.setPower(-motorPower);
+        backRightMotor.setPower(motorPower);
+
+        while(backRightMotor.isBusy())
+        {
+            frontLeftMotor.setPower(motorPower);
+            frontRightMotor.setPower(motorPower);
+            backLeftMotor.setPower(-motorPower);
+            backRightMotor.setPower(motorPower);
+        }
+
+        frontLeftMotor.setPower(0.0);
+        frontRightMotor.setPower(0.0);
+        backLeftMotor.setPower(0.0);
+        backRightMotor.setPower(0.0);
+
+        backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        return;
+    }
+
+    private void runRightRotate(double distance) {
+        this.backLeftMotor.setTargetPosition((int) distance + backLeftMotor.getCurrentPosition());
+        backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        frontLeftMotor.setPower(motorPower);
+        frontRightMotor.setPower(-motorPower);
+        backLeftMotor.setPower(motorPower);
+        backRightMotor.setPower(-motorPower);
+
+        while(backLeftMotor.isBusy())
+        {
+            frontLeftMotor.setPower(motorPower);
+            frontRightMotor.setPower(-motorPower);
+            backLeftMotor.setPower(motorPower);
+            backRightMotor.setPower(-motorPower);
+        }
+
+        frontLeftMotor.setPower(0.0);
+        frontRightMotor.setPower(0.0);
+        backLeftMotor.setPower(0.0);
+        backRightMotor.setPower(0.0);
+
+        backLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        return;
+    }
+
+    public void setChassisSpeed(double power){
+        this.motorPower = power;
     }
 }
