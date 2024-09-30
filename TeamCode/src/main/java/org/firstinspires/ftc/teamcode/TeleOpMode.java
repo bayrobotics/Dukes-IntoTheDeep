@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.components.Chassis;
 import org.firstinspires.ftc.teamcode.components.Intake;
-import org.firstinspires.ftc.teamcode.components.Lift;
 import org.firstinspires.ftc.teamcode.components.RobotComponent;
 
 import java.util.LinkedList;
