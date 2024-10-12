@@ -26,20 +26,20 @@ public class Intake extends RobotComponent{
     }
 
     public void moveIntake(Gamepad gamepad, Gamepad gamepad2) {
-        if(gamepad.left_bumper && !gamepad.right_bumper) {
+        if(gamepad2.dpad_left) {
             intakeLift.setPosition(0.8);
         }
 
-        if(gamepad.right_bumper && !gamepad.left_bumper) {
+        if(gamepad2.dpad_right) {
             intakeLift.setPosition(0);
         }
     }
 
     public void spin(Gamepad gamepad, Gamepad gamepad2) {
 
-        if(gamepad.a) {
+        if(gamepad2.left_bumper) {
             spinner.setPower(-1);
-        } else if(gamepad.b) {
+        } else if(gamepad2.right_bumper) {
             spinner.setPower(1);
         } else {
             spinner.setPower(0);
