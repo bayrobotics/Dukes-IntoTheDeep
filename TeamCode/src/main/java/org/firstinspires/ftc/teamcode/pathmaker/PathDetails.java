@@ -87,7 +87,7 @@ public class PathDetails {
     }
     public enum Path {
         // Each path is labeled with a name as defined in this enum
-        P1, P11, P2, P3, P4,
+        P1, P2, P3, P4,
         DRIVER_CONTROLLED,
         DONE
     }   // end enum Event
@@ -99,6 +99,7 @@ public class PathDetails {
         PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
         autoPathList = new ArrayList<PathDetails.Path>();
         autoPathList.add(PathDetails.Path.P1);
+        autoPathList.add(PathDetails.Path.P2);
     }   // end method initAuto
 
     public static void setPath(Path path, Telemetry telemetry) throws InterruptedException {
@@ -117,59 +118,30 @@ public class PathDetails {
             case P1:
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.AUTO_ExecutePath;
-                powerScaling = 0.8;
-                xFieldGoal_in = -12; yFieldGoal_in = 0; aFieldGoal_deg = 0;
-                yFieldDelay_ms = 700;
-                //PathManager.rampType_y = PathManager.RAMPTYPE.STEP;
-                PathManager.yTargetZone_in = 2;
-                PathManager.xTargetZone_in = 1;
-                PathManager.turnTargetZone_deg = 2;
-                PathManager.yMinVelocity_InchPerSec = 7;
-                PathManager.xMinVelocity_InchPerSec = 2;
-                PathManager.approachPowerTurn = 0.1;
-                PathManager.approachPowerXY = 0.25;
-                PathManager.yRampReach_in = 0;
-                calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
-                break;
-            case P11:
-                PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
-                PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.AUTO_ExecutePath;
-                powerScaling = 0.8;
-                xFieldGoal_in = -12; yFieldGoal_in = 48; aFieldGoal_deg = 0;
-                PathManager.rampType_y = PathManager.RAMPTYPE.STEP;
-                PathManager.yTargetZone_in = 2;
-                PathManager.xTargetZone_in = 1;
-                PathManager.turnTargetZone_deg = 2;
-                PathManager.yMinVelocity_InchPerSec = 7;
-                PathManager.xMinVelocity_InchPerSec = 2;
-                PathManager.approachPowerTurn = 0.1;
-                PathManager.approachPowerXY = 0.25;
-                PathManager.yRampReach_in = 24;
-                PathManager.xRampReach_in = 24;
+                powerScaling = 0.5;
+                xFieldGoal_in = 0; yFieldGoal_in = 120; aFieldGoal_deg = 0;
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
             case P2:
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.AUTO_ExecutePath;
-                PathManager.yRampReach_in = 0;
                 powerScaling = 0.5;
-                xFieldGoal_in = -12; yFieldGoal_in = 12; aFieldGoal_deg = 0;
+                xFieldGoal_in = -48; yFieldGoal_in = 120; aFieldGoal_deg = 0;
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
             case P3:
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.AUTO_ExecutePath;
-                PathManager.yRampReach_in = 0;
-                powerScaling = 0.5;
-                xFieldGoal_in = -12; yFieldGoal_in = -6; aFieldGoal_deg = 0;
+                powerScaling = 0.4;
+                xFieldGoal_in = 40; yFieldGoal_in = 60; aFieldGoal_deg = 180;
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
             case P4:
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.AUTO_ExecutePath;
-                PathManager.yRampReach_in = 5;
-                powerScaling = 0.5;
-                xFieldGoal_in = -12; yFieldGoal_in = -10; aFieldGoal_deg = 0;
+                powerScaling = 0.4;
+                xFieldGoal_in = 60; yFieldGoal_in = 60; aFieldGoal_deg = 180;
+                calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
             case DONE:
                 break;

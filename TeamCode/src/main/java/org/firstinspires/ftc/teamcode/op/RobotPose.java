@@ -110,8 +110,8 @@ public class RobotPose {
         PathDetails.xFieldGoal_in = 0;
         PathDetails.lastTurnGoal = 0;
         if (odometry == ODOMETRY.DEADWHEEL) {
-            L = 30.3; // distance between left and right encoders in cm - LATERAL DISTANCE
-            B = 0; // distance between midpoints of left and right encoders and encoder aux
+            L = 37.00; // distance between left and right encoders in cm - LATERAL DISTANCE
+            B = 21.35; // distance between midpoints of left and right encoders and encoder aux
             R = 2.4; // GoBilda odometry wheel radius in cm (48mm diameter)
             N = 2000; // GoBilda odometry pod: 2000 Countable Events per Revolution
         } else if (odometry == ODOMETRY.XYPLUSIMU) {
@@ -173,7 +173,7 @@ public class RobotPose {
             dn3 = currentAuxPosition - previousAuxPosition;
 
             //find out robot movement in cm
-            dtheta = -cm_per_tick * (dn2 - dn1) / L;
+            dtheta = cm_per_tick * (dn2 - dn1) / L;
             dy = cm_per_tick * (dn1 + dn2) / 2.0;
             dx = cm_per_tick * (-dn3 + (dn2 - dn1) * B / L);
             lastHeadingAngle_rad = headingAngle_rad;

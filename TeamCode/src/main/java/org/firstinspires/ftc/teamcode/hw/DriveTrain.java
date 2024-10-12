@@ -9,6 +9,7 @@ package org.firstinspires.ftc.teamcode.hw;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -42,8 +43,10 @@ public class DriveTrain {
         initMotor(backRight);
         initMotor(frontRight);
         // if all motors are plugged in the same you may need to do:
-        frontLeft.setDirection(DcMotorEx.Direction.REVERSE);
-        backLeft.setDirection(DcMotorEx.Direction.REVERSE);
+        frontLeft.setDirection(DcMotorEx.Direction.FORWARD);
+        backLeft.setDirection(DcMotorEx.Direction.FORWARD);
+        backRight.setDirection(DcMotorEx.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         // Get access to a list of Expansion Hub Modules to enable changing caching methods.
         allHubs = myOpMode.hardwareMap.getAll(LynxModule.class);
         // Set all Expansion hubs to use the MANUAL Bulk Caching mode

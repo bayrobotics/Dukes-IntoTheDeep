@@ -184,7 +184,8 @@ public class PathMakerStateMachine {
                 } else if (PathManager.inTargetZone) {
                     pm_state = PM_STATE.AUTO_NEXT_PATH;
                 } else if (PathDetails.elapsedTime_ms.milliseconds()>1000 && RobotPose.isRobotAtRest()) { // robot at rest after first moving (1000 ms)
-                    pm_state = PM_STATE.AUTO_NEXT_PATH;
+                    if (PathDetails.elapsedTime_ms.milliseconds() > Math.max(Math.max(PathDetails.xFieldDelay_ms, PathDetails.yFieldDelay_ms), PathDetails.turnFieldDelay_ms) + 10.0)
+                        pm_state = PM_STATE.AUTO_NEXT_PATH;
                 } else {
                     PathManager.moveRobot();
                 }

@@ -159,7 +159,7 @@ public class Chassis extends RobotComponent {
         telemetry.addData("motorSpeed: ", motorPower);
         telemetry.update();
 
-        if (backRightDistance > 0) {
+        if (backRightDistance >  0) {
             runRightRotate(Math.abs(backRightDistance));
         }
         else if (backRightDistance < 0) {

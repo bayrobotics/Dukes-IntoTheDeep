@@ -11,4 +11,3 @@ public abstract class RobotComponent {
     public abstract void updateState(Gamepad gamepad1, Gamepad gamepad2);
 
 }
-
