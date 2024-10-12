@@ -11,6 +11,7 @@ public class Lift extends RobotComponent {
     public Telemetry telemetry;
     private DcMotor leftLift;
     private DcMotor rightLift;
+    private int count = 0;
 
     public Lift(DcMotor leftLift,
                 DcMotor rightLift,
@@ -19,33 +20,79 @@ public class Lift extends RobotComponent {
         this.telemetry = telemetry;
         this.leftLift = leftLift;
         this.rightLift = rightLift;
-        initMotor(this.leftLift, DcMotor.Direction.FORWARD);
-        initMotor(this.rightLift, DcMotor.Direction. REVERSE);
+        initMotor(this.leftLift, DcMotor.Direction.REVERSE);
+        initMotor(this.rightLift, DcMotor.Direction.FORWARD);
 
     }
 
     public enum LiftState {
-        DOWN, LOW, HIGH
+        MANUAL, PRESET
     }
 
     public void updateState(Gamepad gamepad, Gamepad gamepad2) {
-        manualMoveLift(gamepad, gamepad2);
+        moveLift(gamepad, gamepad2);
 
         telemetry.addData("Lift encoder value: ", leftLift.getCurrentPosition());
         telemetry.update();
     }
 
-    public void manualMoveLift(Gamepad gamepad, Gamepad gamepad2) {
+    public void moveLift(Gamepad gamepad, Gamepad gamepad2) {
 
-        if(gamepad.y && leftLift.getCurrentPosition() < 800) {
-            leftLift.setPower(-0.6);
-            rightLift.setPower(-0.6);
-        } else if (gamepad.x && leftLift.getCurrentPosition() > 0) {
-            leftLift.setPower(0.6);
-            rightLift.setPower(0.6);
+        LiftState liftState;
+
+        if (gamepad2.x) {
+            count++;
+        }
+
+        if (count % 2 == 0) {
+            liftState = LiftState.MANUAL;
+            leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         } else {
-            leftLift.setPower(0);
-            rightLift.setPower(0);
+            liftState = LiftState.PRESET;
+            leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        }
+
+
+        if (liftState == LiftState.MANUAL) {
+            if (gamepad2.y && leftLift.getCurrentPosition() < 2380 && !gamepad2.x) {
+                setLiftPower(1);
+            } else if (gamepad2.b && leftLift.getCurrentPosition() > 0 && !gamepad2.x) {
+                setLiftPower(-1);
+            } else {
+                setLiftPower(0);
+            }
+        } else if(liftState == LiftState.PRESET) {
+            if(gamepad2.y && !gamepad2.x) {
+                leftLift.setTargetPosition(2380);
+                goToTargetPosition();
+            } else if(gamepad2.b && !gamepad2.x) {
+                leftLift.setTargetPosition(1500);
+                goToTargetPosition();
+            } else if(gamepad2.a && !gamepad2.x) {
+                leftLift.setTargetPosition(0);
+                goToTargetPosition();
+            }
+        }
+
+    }
+
+    public void setLiftPower(double power) {
+
+        leftLift.setPower(power);
+        rightLift.setPower(power);
+
+    }
+
+    public void goToTargetPosition() {
+
+        if(leftLift.getCurrentPosition() > leftLift.getTargetPosition() + 10) {
+            setLiftPower(-1);
+        } else if(leftLift.getCurrentPosition() < leftLift.getTargetPosition() - 10) {
+            setLiftPower(1);
+        } else {
+            setLiftPower(0);
         }
 
     }
