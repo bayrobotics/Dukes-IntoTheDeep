@@ -1,17 +1,15 @@
 package org.firstinspires.ftc.teamcode.components;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.hardware.configuration.annotations.DigitalIoDeviceType;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Lift extends RobotComponent {
 
     public Telemetry telemetry;
-    private DcMotor leftLift;
-    private DcMotor rightLift;
-    private int count = 0;
 
     public Lift(DcMotor leftLift,
                 DcMotor rightLift,
@@ -30,52 +28,55 @@ public class Lift extends RobotComponent {
     }
 
     public void updateState(Gamepad gamepad, Gamepad gamepad2) {
-        moveLift(gamepad, gamepad2);
 
-        telemetry.addData("Lift encoder value: ", leftLift.getCurrentPosition());
-        telemetry.update();
-    }
-
-    public void moveLift(Gamepad gamepad, Gamepad gamepad2) {
-
-        LiftState liftState;
-
-        if (gamepad2.x) {
+        if (gamepad2.dpad_left) {
             count++;
         }
 
         if (count % 2 == 0) {
             liftState = LiftState.MANUAL;
             leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         } else {
             liftState = LiftState.PRESET;
             leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         }
 
+        if(bottomSwitch.isPressed()) {
+            leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            if(liftState == LiftState.MANUAL) {
+                leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            } else if(liftState == LiftState.PRESET) {
+                leftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+        }
+
+        moveLift(gamepad, gamepad2);
+        telemetry.addData("Lift encoder value: ", leftLift.getCurrentPosition());
+        telemetry.update();
+    }
+
+    public void moveLift(Gamepad gamepad, Gamepad gamepad2) {
 
         if (liftState == LiftState.MANUAL) {
-            if (gamepad2.y && leftLift.getCurrentPosition() < 2380 && !gamepad2.x) {
+            if (gamepad2.dpad_up && leftLift.getCurrentPosition() < 2380) {
                 setLiftPower(1);
-            } else if (gamepad2.b && leftLift.getCurrentPosition() > 0 && !gamepad2.x) {
+            } else if (gamepad2.dpad_down && !bottomSwitch.isPressed()) {
                 setLiftPower(-1);
             } else {
                 setLiftPower(0);
             }
         } else if(liftState == LiftState.PRESET) {
-            if(gamepad2.y && !gamepad2.x) {
+            if(gamepad2.dpad_up) {
                 leftLift.setTargetPosition(2380);
-                goToTargetPosition();
-            } else if(gamepad2.b && !gamepad2.x) {
+                moveUntilX(gamepad2);
+            } else if(gamepad2.dpad_right) {
                 leftLift.setTargetPosition(1500);
-                goToTargetPosition();
-            } else if(gamepad2.a && !gamepad2.x) {
+                moveUntilX(gamepad2);
+            } else if(gamepad2.dpad_down) {
                 leftLift.setTargetPosition(0);
-                goToTargetPosition();
+                moveUntilX(gamepad2);
             }
         }
-
     }
 
     public void setLiftPower(double power) {
@@ -85,17 +86,22 @@ public class Lift extends RobotComponent {
 
     }
 
-    public void goToTargetPosition() {
-
-        if(leftLift.getCurrentPosition() > leftLift.getTargetPosition() + 10) {
-            setLiftPower(-1);
-        } else if(leftLift.getCurrentPosition() < leftLift.getTargetPosition() - 10) {
+    public void moveUntilX(Gamepad gamepad2) {
+        while(leftLift.isBusy()) {
             setLiftPower(1);
-        } else {
-            setLiftPower(0);
+            if(gamepad2.dpad_left || bottomSwitch.isPressed()) {
+                setLiftPower(0);
+            }
         }
-
+        setLiftPower(0);
     }
+
+    private LiftState liftState;
+    private DcMotor leftLift;
+    private DcMotor rightLift;
+    private int count = 0;
+    private TouchSensor bottomSwitch;
+
 
     private void initMotor(DcMotor motor, DcMotor.Direction motorDirection) throws InterruptedException {
         motor.setDirection(motorDirection);
