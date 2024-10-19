@@ -31,36 +31,59 @@ public class Lift extends RobotComponent {
 
     public void updateState(Gamepad gamepad, Gamepad gamepad2) {
 
-        if(bottomSwitch.isPressed()) leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        if(bottomSwitch.isPressed()) {
+            leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
 
-        if(liftMode == LiftMode.PRESET) leftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        else if(liftMode == LiftMode.MANUAL) leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        if(liftMode == LiftMode.PRESET) {
+            leftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+        else if(liftMode == LiftMode.MANUAL) {
+            leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
 
 
         if(gamepad2.dpad_left) {
 
-            if(liftMode == LiftMode.MANUAL) liftMode = LiftMode.PRESET;
-            else if(liftMode == LiftMode.PRESET) liftMode = LiftMode.MANUAL;
+            if(liftMode == LiftMode.MANUAL) {
+                liftMode = LiftMode.PRESET;
+            } else if(liftMode == LiftMode.PRESET) {
+                liftMode = LiftMode.MANUAL;
+            }
 
-            if(liftState == LiftState.MOVING) setLiftPower(0);
+            if(liftState == LiftState.MOVING) {
+                setLiftPower(0);
+            }
 
         } else if(gamepad2.dpad_up) {
 
-            if(liftMode == LiftMode.MANUAL) setLiftPower(1);
-            else if(liftMode == LiftMode.PRESET) moveTo(gamepad2, 2380);
+            if(liftMode == LiftMode.MANUAL) {
+                setLiftPower(1);
+            }
+            else if(liftMode == LiftMode.PRESET) {
+                moveTo(gamepad2, 2380);
+            }
 
         } else if(gamepad2.dpad_right) {
 
-            if(liftMode == LiftMode.PRESET) moveTo(gamepad2, 1500); // 1500 is estimate
+            if(liftMode == LiftMode.PRESET) {
+                moveTo(gamepad2, 1500); // 1500 is estimate
+            }
 
         } else if(gamepad2.dpad_down) {
 
-            if(liftMode == LiftMode.MANUAL) setLiftPower(-1);
-            else if(liftMode == LiftMode.PRESET) moveTo(gamepad2, 0);
+            if(liftMode == LiftMode.MANUAL) {
+                setLiftPower(-1);
+            } else if(liftMode == LiftMode.PRESET) {
+                moveTo(gamepad2, 0);
+            }
 
         } else {
 
-            if(liftMode == LiftMode.MANUAL) setLiftPower(0);
+            if(liftMode == LiftMode.MANUAL) {
+                setLiftPower(0);
+            }
 
         }
 
@@ -74,14 +97,20 @@ public class Lift extends RobotComponent {
 
     public void setLiftPower(double power) {
 
-        if(power < 0 && bottomSwitch.isPressed()) power = 0;
-        else if(power > 0 && leftLift.getCurrentPosition() > 2380) power = 0;
+        if(power < 0 && bottomSwitch.isPressed()) {
+            power = 0;
+        } else if(power > 0 && leftLift.getCurrentPosition() > 2380) {
+            power = 0;
+        }
 
         leftLift.setPower(power);
         rightLift.setPower(power);
 
-        if(power != 0) liftState = liftState.MOVING;
-        else liftState = liftState.STOPPED;
+        if(power != 0) {
+            liftState = liftState.MOVING;
+        } else {
+            liftState = liftState.STOPPED;
+        }
 
     }
 
@@ -89,7 +118,10 @@ public class Lift extends RobotComponent {
 
         leftLift.setTargetPosition(target);
         setLiftPower(1);
-        if(!leftLift.isBusy()) setLiftPower(0);
+
+        if(!leftLift.isBusy()) {
+            setLiftPower(0);
+        }
 
     }
 

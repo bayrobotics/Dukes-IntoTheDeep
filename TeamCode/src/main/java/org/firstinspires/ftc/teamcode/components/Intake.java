@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Intake extends RobotComponent{
 
-    Servo intakeLift;
-    CRServo spinner;
+    private Servo intakeLift;
+    private CRServo spinner;
 
 
     public Intake(Servo intakeLift, CRServo spinner) {
@@ -21,21 +21,11 @@ public class Intake extends RobotComponent{
 
     public void updateState(Gamepad gamepad, Gamepad gamepad2) {
 
-        moveIntake(gamepad, gamepad2);
-        spin(gamepad, gamepad2);
-    }
-
-    public void moveIntake(Gamepad gamepad, Gamepad gamepad2) {
         if(gamepad2.y) {
             intakeLift.setPosition(0.8);
-        }
-
-        if(gamepad2.a) {
+        } else if(gamepad2.a) {
             intakeLift.setPosition(0);
         }
-    }
-
-    public void spin(Gamepad gamepad, Gamepad gamepad2) {
 
         if(gamepad2.left_bumper) {
             spinner.setPower(-1);
@@ -46,6 +36,5 @@ public class Intake extends RobotComponent{
         }
 
     }
-
 
 }
