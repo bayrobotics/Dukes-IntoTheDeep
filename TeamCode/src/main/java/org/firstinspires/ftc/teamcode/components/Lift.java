@@ -68,13 +68,13 @@ public class Lift extends RobotComponent {
         } else if(liftState == LiftState.PRESET) {
             if(gamepad2.dpad_up) {
                 leftLift.setTargetPosition(2380);
-                moveUntilX(gamepad2);
+                moveUntilInterrupt(gamepad2);
             } else if(gamepad2.dpad_right) {
-                leftLift.setTargetPosition(1500);
-                moveUntilX(gamepad2);
+                leftLift.setTargetPosition(1500); // 1500 is estimate
+                moveUntilInterrupt(gamepad2);
             } else if(gamepad2.dpad_down) {
                 leftLift.setTargetPosition(0);
-                moveUntilX(gamepad2);
+                moveUntilInterrupt(gamepad2);
             }
         }
     }
@@ -86,11 +86,12 @@ public class Lift extends RobotComponent {
 
     }
 
-    public void moveUntilX(Gamepad gamepad2) {
-        while(leftLift.isBusy()) {
-            setLiftPower(1);
+    public void moveUntilInterrupt(Gamepad gamepad2) {
+        setLiftPower(1);
+        if(leftLift.isBusy()) {
             if(gamepad2.dpad_left || bottomSwitch.isPressed()) {
                 setLiftPower(0);
+                leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
         }
         setLiftPower(0);
