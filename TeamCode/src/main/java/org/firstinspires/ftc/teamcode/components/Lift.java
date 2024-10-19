@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.components;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.hardware.configuration.annotations.DigitalIoDeviceType;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Lift extends RobotComponent {
@@ -23,84 +21,82 @@ public class Lift extends RobotComponent {
 
     }
 
-    public enum LiftState {
+    public enum LiftMode {
         MANUAL, PRESET
+    }
+
+    public enum LiftState {
+        STOPPED, MOVING
     }
 
     public void updateState(Gamepad gamepad, Gamepad gamepad2) {
 
-        if (gamepad2.dpad_left) {
-            count++;
-        }
+        if(bottomSwitch.isPressed()) leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        if (count % 2 == 0) {
-            liftState = LiftState.MANUAL;
-            leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        if(liftMode == LiftMode.PRESET) leftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        else if(liftMode == LiftMode.MANUAL) leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+        if(gamepad2.dpad_left) {
+
+            if(liftMode == LiftMode.MANUAL) liftMode = LiftMode.PRESET;
+            else if(liftMode == LiftMode.PRESET) liftMode = LiftMode.MANUAL;
+
+            if(liftState == LiftState.MOVING) setLiftPower(0);
+
+        } else if(gamepad2.dpad_up) {
+
+            if(liftMode == LiftMode.MANUAL) setLiftPower(1);
+            else if(liftMode == LiftMode.PRESET) moveTo(gamepad2, 2380);
+
+        } else if(gamepad2.dpad_right) {
+
+            if(liftMode == LiftMode.PRESET) moveTo(gamepad2, 1500); // 1500 is estimate
+
+        } else if(gamepad2.dpad_down) {
+
+            if(liftMode == LiftMode.MANUAL) setLiftPower(-1);
+            else if(liftMode == LiftMode.PRESET) moveTo(gamepad2, 0);
+
         } else {
-            liftState = LiftState.PRESET;
-            leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            if(liftMode == LiftMode.MANUAL) setLiftPower(0);
+
         }
 
-        if(bottomSwitch.isPressed()) {
-            leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            if(liftState == LiftState.MANUAL) {
-                leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            } else if(liftState == LiftState.PRESET) {
-                leftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            }
-        }
-
-        moveLift(gamepad, gamepad2);
         telemetry.addData("Lift encoder value: ", leftLift.getCurrentPosition());
+        telemetry.addData("Lift Mode", liftMode);
+        telemetry.addData("Lift State", liftState);
         telemetry.update();
+
     }
 
-    public void moveLift(Gamepad gamepad, Gamepad gamepad2) {
-
-        if (liftState == LiftState.MANUAL) {
-            if (gamepad2.dpad_up && leftLift.getCurrentPosition() < 2380) {
-                setLiftPower(1);
-            } else if (gamepad2.dpad_down && !bottomSwitch.isPressed()) {
-                setLiftPower(-1);
-            } else {
-                setLiftPower(0);
-            }
-        } else if(liftState == LiftState.PRESET) {
-            if(gamepad2.dpad_up) {
-                leftLift.setTargetPosition(2380);
-                moveUntilInterrupt(gamepad2);
-            } else if(gamepad2.dpad_right) {
-                leftLift.setTargetPosition(1500); // 1500 is estimate
-                moveUntilInterrupt(gamepad2);
-            } else if(gamepad2.dpad_down) {
-                leftLift.setTargetPosition(0);
-                moveUntilInterrupt(gamepad2);
-            }
-        }
-    }
 
     public void setLiftPower(double power) {
+
+        if(power < 0 && bottomSwitch.isPressed()) power = 0;
+        else if(power > 0 && leftLift.getCurrentPosition() > 2380) power = 0;
 
         leftLift.setPower(power);
         rightLift.setPower(power);
 
+        if(power != 0) liftState = liftState.MOVING;
+        else liftState = liftState.STOPPED;
+
     }
 
-    public void moveUntilInterrupt(Gamepad gamepad2) {
+    public void moveTo(Gamepad gamepad2, int target) {
+
+        leftLift.setTargetPosition(target);
         setLiftPower(1);
-        if(leftLift.isBusy()) {
-            if(gamepad2.dpad_left || bottomSwitch.isPressed()) {
-                setLiftPower(0);
-                leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            }
-        }
-        setLiftPower(0);
+        if(!leftLift.isBusy()) setLiftPower(0);
+
     }
 
-    private LiftState liftState;
+    private LiftMode liftMode = LiftMode.MANUAL;
+    private LiftState liftState = LiftState.STOPPED;
     private DcMotor leftLift;
     private DcMotor rightLift;
-    private int count = 0;
     private TouchSensor bottomSwitch;
 
 
