@@ -11,9 +11,11 @@ public class Lift extends RobotComponent {
 
     public Lift(DcMotor leftLift,
                 DcMotor rightLift,
+                TouchSensor bottomSwitch,
                 Telemetry telemetry) throws InterruptedException {
 
         this.telemetry = telemetry;
+        this.bottomSwitch = bottomSwitch;
         this.leftLift = leftLift;
         this.rightLift = rightLift;
         initMotor(this.leftLift, DcMotor.Direction.REVERSE);
@@ -37,7 +39,7 @@ public class Lift extends RobotComponent {
 
 
         if(liftMode == LiftMode.PRESET) {
-            leftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
         else if(liftMode == LiftMode.MANUAL) {
             leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -62,7 +64,7 @@ public class Lift extends RobotComponent {
                 setLiftPower(1);
             }
             else if(liftMode == LiftMode.PRESET) {
-                moveTo(gamepad2, 2380);
+                moveTo(gamepad2, 2350);
             }
 
         } else if(gamepad2.dpad_right) {
@@ -90,6 +92,7 @@ public class Lift extends RobotComponent {
         telemetry.addData("Lift encoder value: ", leftLift.getCurrentPosition());
         telemetry.addData("Lift Mode", liftMode);
         telemetry.addData("Lift State", liftState);
+        telemetry.addData("Left Lift Mode", leftLift.getMode());
         telemetry.update();
 
     }
@@ -99,7 +102,7 @@ public class Lift extends RobotComponent {
 
         if(power < 0 && bottomSwitch.isPressed()) {
             power = 0;
-        } else if(power > 0 && leftLift.getCurrentPosition() > 2380) {
+        } else if(power > 0 && leftLift.getCurrentPosition() > 2350) {
             power = 0;
         }
 
@@ -117,13 +120,14 @@ public class Lift extends RobotComponent {
     public void moveTo(Gamepad gamepad2, int target) {
 
         leftLift.setTargetPosition(target);
-        setLiftPower(1);
 
-        if(!leftLift.isBusy()) {
+        if(Math.abs(leftLift.getCurrentPosition() - leftLift.getTargetPosition()) <= 1000) {
             setLiftPower(0);
+        } else {
+            setLiftPower(1);
         }
-
     }
+
 
     private LiftMode liftMode = LiftMode.MANUAL;
     private LiftState liftState = LiftState.STOPPED;
@@ -138,6 +142,7 @@ public class Lift extends RobotComponent {
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Thread.sleep(100);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor.setTargetPosition(0);
         return;
     }
 }
