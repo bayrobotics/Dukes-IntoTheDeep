@@ -46,6 +46,19 @@ public class Lift extends RobotComponent {
         }
 
 
+        if(liftMode == LiftMode.PRESET && liftState == liftState.MOVING) {
+            if(!leftLift.isBusy()) {
+                setLiftPower(0);
+            }
+        }
+
+        if(liftMode == LiftMode.PRESET && liftState == liftState.STOPPED) {
+            if(leftLift.getCurrentPosition() - leftLift.getTargetPosition() < -20) {
+                moveTo(leftLift.getTargetPosition(), 0.2);
+            }
+        }
+
+
         if(gamepad2.dpad_left) {
 
             if(liftMode == LiftMode.MANUAL) {
@@ -64,13 +77,13 @@ public class Lift extends RobotComponent {
                 setLiftPower(1);
             }
             else if(liftMode == LiftMode.PRESET) {
-                moveTo(gamepad2, 2350);
+                moveTo(2300, 0.5);
             }
 
         } else if(gamepad2.dpad_right) {
 
             if(liftMode == LiftMode.PRESET) {
-                moveTo(gamepad2, 1500); // 1500 is estimate
+                moveTo(1500, 0.5); // 1500 is estimate
             }
 
         } else if(gamepad2.dpad_down) {
@@ -78,7 +91,7 @@ public class Lift extends RobotComponent {
             if(liftMode == LiftMode.MANUAL) {
                 setLiftPower(-1);
             } else if(liftMode == LiftMode.PRESET) {
-                moveTo(gamepad2, 0);
+                moveTo(0, 0.5);
             }
 
         } else {
@@ -89,10 +102,13 @@ public class Lift extends RobotComponent {
 
         }
 
-        telemetry.addData("Lift encoder value: ", leftLift.getCurrentPosition());
+        telemetry.addData("LiftEencoder Value: ", leftLift.getCurrentPosition());
         telemetry.addData("Lift Mode", liftMode);
         telemetry.addData("Lift State", liftState);
         telemetry.addData("Left Lift Mode", leftLift.getMode());
+        telemetry.addData("Target Position", leftLift.getTargetPosition());
+        telemetry.addData("Left Power", leftLift.getPower());
+        telemetry.addData("Right Power", rightLift.getPower());
         telemetry.update();
 
     }
@@ -102,7 +118,7 @@ public class Lift extends RobotComponent {
 
         if(power < 0 && bottomSwitch.isPressed()) {
             power = 0;
-        } else if(power > 0 && leftLift.getCurrentPosition() > 2350) {
+        } else if(power > 0 && leftLift.getCurrentPosition() > 2300) {
             power = 0;
         }
 
@@ -117,15 +133,16 @@ public class Lift extends RobotComponent {
 
     }
 
-    public void moveTo(Gamepad gamepad2, int target) {
+    public void moveTo(int target, double power) {
 
         leftLift.setTargetPosition(target);
 
-        if(Math.abs(leftLift.getCurrentPosition() - leftLift.getTargetPosition()) <= 1000) {
-            setLiftPower(0);
+        if(leftLift.getTargetPosition() >= leftLift.getCurrentPosition()) {
+            setLiftPower(power);
         } else {
-            setLiftPower(1);
+            setLiftPower(-power);
         }
+
     }
 
 
