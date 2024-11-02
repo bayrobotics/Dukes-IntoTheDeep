@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.components.Chassis;
 import org.firstinspires.ftc.teamcode.components.Intake;
@@ -26,11 +27,13 @@ public class TeleOpMode extends LinearOpMode {
                 hardwareMap.get(DcMotor.class, "back_right"),DcMotor.Direction.FORWARD ,
                 hardwareMap.get(DcMotor.class, "back_left"), DcMotor.Direction.REVERSE, telemetry);
 
-        Intake intake = new Intake(hardwareMap.get(Servo.class, "intakeLift"),
+        Intake intake = new Intake(hardwareMap.get(CRServo.class, "intakeLift"),
                 hardwareMap.get(CRServo.class, "spinner"));
 
         Lift lift = new Lift(hardwareMap.get(DcMotor.class, "leftLift"),
         hardwareMap.get(DcMotor.class, "rightLift"),
+        hardwareMap.get(TouchSensor.class, "bottomSwitch"),
+        // hardwareMap.get(DcMotor.class, "bucket"),
                 telemetry);
 
         List<RobotComponent> components = new LinkedList<RobotComponent>();

@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.pathmaker;
 
+import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.liftHeight;
+import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.liftPower;
+
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -7,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hw.DriveTrain;
 import org.firstinspires.ftc.teamcode.hw.WebCam;
 import org.firstinspires.ftc.teamcode.op.RobotPose;
+import org.firstinspires.ftc.teamcode.components.Lift;
 
 public class PathMakerStateMachine {
     // The PathMakerStateMachine manages the state of the robot as defined in the State enum.
@@ -17,11 +21,13 @@ public class PathMakerStateMachine {
     // managed by the PathMakerStateMachine. For example, based on the robot field position the
     // arm position should be controlled so that the robot does not interfere with the truss.
 
+
+
     enum CONTROL_MODE {
         TELEOP, AUTONOMOUS
     }   // end enum GameMode
     enum PM_STATE {
-        INIT, IDLE, DONE, DRIVER_CONTROL,AUTO_SET_PATH, AUTO_NEXT_PATH, AUTO_APRILTAG_ExecutePath, AUTO_ExecutePath
+        INIT, IDLE, DONE, DRIVER_CONTROL,AUTO_SET_PATH, AUTO_NEXT_PATH, AUTO_APRILTAG_ExecutePath, AUTO_ExecutePath, CONTROL_LIFT, CONTROL_INTAKE
     }   // end enum State
 
     public static PM_STATE pm_state;
@@ -164,7 +170,7 @@ public class PathMakerStateMachine {
     //
     // Autonomous section
     //
-    public static void updateAuto(Telemetry telemetry) throws InterruptedException {
+    public static void updateAuto(Telemetry telemetry, Lift lift) throws InterruptedException {
         RobotPose.readPose(); // read pose once per auto loop (moved here from PathManager)
         // process state
         switch (pm_state) {
@@ -199,6 +205,18 @@ public class PathMakerStateMachine {
                 } else {
                     pm_state = PM_STATE.AUTO_SET_PATH;
                 }
+                break;
+            case CONTROL_LIFT:
+                PathManager.moveRobot();
+                lift.moveTo(liftHeight, liftPower);
+                if(Math.abs(lift.getHeight() - liftHeight) < 50) {
+                    liftPower = 0;
+                } else {
+                    liftPower = 0.25;
+                }
+                break;
+            case CONTROL_INTAKE:
+                PathManager.moveRobot();
                 break;
         }   // end switch (state)
     }   // end method update

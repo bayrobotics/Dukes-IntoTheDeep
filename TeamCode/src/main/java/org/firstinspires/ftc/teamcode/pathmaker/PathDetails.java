@@ -28,6 +28,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hw.WebCam;
 import org.firstinspires.ftc.teamcode.op.RobotPose;
+import org.firstinspires.ftc.teamcode.components.Lift;
 
 import java.util.ArrayList;
 
@@ -52,6 +53,8 @@ public class PathDetails {
     public static ElapsedTime elapsedTime_ms = new ElapsedTime();
     public static double pathTime_ms = 0;
     public  static PathMakerStateMachine.PM_STATE PMSMstate;
+    public static int liftHeight = 0;
+    public static double liftPower = 0;
 
     public static double lastTurnGoal;
 
@@ -100,6 +103,7 @@ public class PathDetails {
         autoPathList = new ArrayList<PathDetails.Path>();
         autoPathList.add(PathDetails.Path.P1);
         autoPathList.add(PathDetails.Path.P2);
+        autoPathList.add(PathDetails.Path.P3);
     }   // end method initAuto
 
     public static void setPath(Path path, Telemetry telemetry) throws InterruptedException {
@@ -117,23 +121,23 @@ public class PathDetails {
                 break;
             case P1:
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
-                PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.AUTO_ExecutePath;
+                PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.CONTROL_LIFT;
                 powerScaling = 0.5;
-                xFieldGoal_in = 0; yFieldGoal_in = 120; aFieldGoal_deg = 0;
+                xFieldGoal_in = 63; yFieldGoal_in = 39; aFieldGoal_deg = 270;
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
             case P2:
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.AUTO_ExecutePath;
                 powerScaling = 0.5;
-                xFieldGoal_in = -48; yFieldGoal_in = 120; aFieldGoal_deg = 0;
+                xFieldGoal_in = 48; yFieldGoal_in = 48; aFieldGoal_deg = 270;
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
             case P3:
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.AUTO_ExecutePath;
                 powerScaling = 0.4;
-                xFieldGoal_in = 40; yFieldGoal_in = 60; aFieldGoal_deg = 180;
+                xFieldGoal_in = 40; yFieldGoal_in = 48; aFieldGoal_deg = 270;
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
             case P4:

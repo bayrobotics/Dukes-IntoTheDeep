@@ -15,9 +15,12 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.components.Lift;
 import org.firstinspires.ftc.teamcode.hw.MyIMU;
 import org.firstinspires.ftc.teamcode.hw.WebCam;
 import org.firstinspires.ftc.teamcode.pathmaker.PathDetails;
@@ -40,12 +43,19 @@ public class Auto_Robot1 extends LinearOpMode {
 
     DriveTrain driveTrain = new DriveTrain(this);
 
+
     @Override
     public void runOpMode() throws InterruptedException {
         WebCam.init(this, telemetry);
 
+        Lift lift = new Lift(hardwareMap.get(DcMotor.class, "leftLift"),
+                hardwareMap.get(DcMotor.class, "rightLift"),
+                hardwareMap.get(TouchSensor.class, "bottomSwitch"),
+                // hardwareMap.get(DcMotor.class, "bucket"),
+                telemetry);
+
         RobotPose.initializePose(this, driveTrain, telemetry);
-        RobotPose.setPose(0, 0, 0);
+        RobotPose.setPose(63, 12, 270);
 
         MyIMU.init(this);
         MyIMU.updateTelemetry(telemetry);
@@ -125,7 +135,7 @@ public class Auto_Robot1 extends LinearOpMode {
                     telemetry.update();
                     cycles = 0;
                 }
-                PathMakerStateMachine.updateAuto(telemetry);
+                PathMakerStateMachine.updateAuto(telemetry, lift);
             }
         }
     }
