@@ -26,7 +26,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.hw.WebCam;
 import org.firstinspires.ftc.teamcode.op.RobotPose;
 import org.firstinspires.ftc.teamcode.components.Lift;
 
@@ -131,6 +130,7 @@ public class PathDetails {
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.AUTO_ExecutePath;
                 powerScaling = 0.5;
                 xFieldGoal_in = 48; yFieldGoal_in = 48; aFieldGoal_deg = 270;
+                // lower intake and spin here
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
             case P3:
@@ -159,45 +159,5 @@ public class PathDetails {
         xInitialPowerSignum = Math.signum( goalX - RobotPose.getFieldX_in());
         yInitialPowerSignum = Math.signum( goalY - RobotPose.getFieldY_in());
         aInitialPowerSignum = Math.signum( goalA - RobotPose.getFieldAngle_deg());
-    }
-
-    // check for AprilTag detection
-    public static void autoAprilTagAndFieldGoals() {
-        // AprilTag detection while the robot is stopped (investigate if robot can move slowly)
-        // This method will rebase the coordinate system to the detected tag
-        // and set the field goals relative to the tag position
-        // The robot will then move to these field goals
-        // This method is called from PathMakerStateMachine
-        int xyWebCamMultiplier = 1;
-        if (WebCam.currentWebCam == WebCam.WEBCAM.WEBCAM2) {
-            xyWebCamMultiplier = -1;
-        }
-        PathManager.maxPowerStepUp = 0.1;
-        //pathTime_ms = PathManager.timeStep_ms;
-        powerScaling = 0.6;
-        // need to update with actual robot position
-        double distanceToTarget = WebCam.distanceToTarget;
-        double a = WebCam.angleToTarget; // yaw angle
-        double x = -distanceToTarget * Math.sin(Math.toRadians(a)) * xyWebCamMultiplier;
-        // limit sideways motion to 5 inches
-        if (Math.abs(x) > 5) {
-            x = 5 * Math.signum(x);
-        } else  {
-            x = WebCam.offsetToTarget;
-        }
-        double y = distanceToTarget * Math.cos(Math.toRadians(a)) * xyWebCamMultiplier;
-        double tagXYA[] = RobotPose.rebaseRelativeToTag(x, y, a, PathMakerStateMachine.aprilTagDetectionID);
-        // position relative to tags
-        yFieldGoal_in = tagXYA[0] + yRelativetoTag;
-        xFieldGoal_in = tagXYA[1] + xRelativeToTag;
-        aFieldGoal_deg = tagXYA[2] + aRelativetoTag;
-        yFieldDelay_ms = 0;
-        xFieldDelay_ms = 0;
-        turnFieldDelay_ms = 0;
-        lastTurnGoal = aFieldGoal_deg;
-        PathManager.yRampReach_in = 24;
-        PathManager.xRampReach_in = 12;
-        PathManager.turnRampReach_deg = 45;
-        //WebCam.stopWebcam();
     }
 }

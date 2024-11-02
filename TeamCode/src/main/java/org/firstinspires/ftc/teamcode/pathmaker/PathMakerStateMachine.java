@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hw.DriveTrain;
-import org.firstinspires.ftc.teamcode.hw.WebCam;
 import org.firstinspires.ftc.teamcode.op.RobotPose;
 import org.firstinspires.ftc.teamcode.components.Lift;
 
@@ -65,22 +64,8 @@ public class PathMakerStateMachine {
     //
     public static void updateTele(Gamepad gamepad, Telemetry telemetry) throws InterruptedException {
         RobotPose.readPose(); // read pose once per tele loop
-        if (aprilTagDetectionOn && WebCam.detectionAprilTag(aprilTagDetectionID, telemetry)  && gamepad.left_bumper) {
-            // making sure we don't mistakenly read old data from the WebCam
-            // until then the field goals are initialized to 0
-            // they will be updated when the robot is re-based in autoAprilTagAndFieldGoals()
-            if (WebCam.targetID == aprilTagDetectionID) {
-                PathDetails.autoAprilTagAndFieldGoals();
-                aprilTagDetectionOn = false;
-                WebCam.currentDetections = null;
-                pm_state = PM_STATE.AUTO_APRILTAG_ExecutePath;
-                PathDetails.elapsedTime_ms.reset();
-            }
-        } else if (pm_state == PM_STATE.AUTO_APRILTAG_ExecutePath) {
-            pm_state = PM_STATE.AUTO_APRILTAG_ExecutePath;
-        } else {
-            pm_state = PM_STATE.DRIVER_CONTROL;
-        }
+        // pm_state = PM_STATE.DRIVER_CONTROL;
+
         switch (pm_state) {
             case INIT:
                 pm_state = PM_STATE.IDLE;

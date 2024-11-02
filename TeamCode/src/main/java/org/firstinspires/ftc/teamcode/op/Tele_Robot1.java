@@ -20,7 +20,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hw.DriveTrain;
 import org.firstinspires.ftc.teamcode.hw.MyIMU;
-import org.firstinspires.ftc.teamcode.hw.WebCam;
 import org.firstinspires.ftc.teamcode.pathmaker.PathDetails;
 import org.firstinspires.ftc.teamcode.pathmaker.PathMakerStateMachine;
 import org.firstinspires.ftc.teamcode.pathmaker.PathManager;
@@ -57,15 +56,12 @@ public class Tele_Robot1 extends LinearOpMode {
         //limitSwitch = hardwareMap.get(TouchSensor.class, "limitSwitch");
         //final ColorRangeSensor colorRangeSensor;
         int cycles = 0;
-        WebCam.init(this, telemetry);
         RobotPose.initializePose(this, driveTrain, telemetry);
         RobotPose.setPose(0, 0, 0);
         MyIMU.init(this);
         PathMakerStateMachine.setDriverControlled();
         PathDetails.initializePath();
         MyIMU.updateTelemetry(telemetry);
-        telemetry.addData("webcam", WebCam.webcamMessage);
-        WebCam.telemetryAprilTag(telemetry);
         telemetry.update();
         waitForStart();
         ElapsedTime timer = new ElapsedTime();
@@ -78,7 +74,6 @@ public class Tele_Robot1 extends LinearOpMode {
                 timer.reset();
                 telemetry.addData("State", PathMakerStateMachine.pm_state);
                 telemetry.addData("PathDetails.currentPath", PathMakerStateMachine.currentPath < 0? -1: PathDetails.autoPathList.get(PathMakerStateMachine.currentPath));
-                telemetry.addLine(String.format("tag detection %b, ID %d, in zone %b", PathMakerStateMachine.aprilTagDetectionOn, PathMakerStateMachine.aprilTagDetectionID, PathManager.inTargetZone));
                 telemetry.addLine(String.format("PathDetails.elapsedTime_ms %.1f", PathDetails.elapsedTime_ms.milliseconds()));
                 telemetry.addLine(String.format("ave tele/PM cycle %d /  %d (ms)", (int) t1, PathManager.PMcycleTime_ms));
                 double [] xya = RobotPose.tagOffset(PathMakerStateMachine.aprilTagDetectionID);
@@ -118,8 +113,6 @@ public class Tele_Robot1 extends LinearOpMode {
                         xPowerLast,
                         turnPowerLast));
                 MyIMU.updateTelemetry(telemetry);
-                telemetry.addData("webcam", WebCam.webcamMessage);
-                WebCam.telemetryAprilTag(telemetry);
                 telemetry.update();
                 cycles = 0;
             }

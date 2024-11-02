@@ -22,7 +22,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.components.Lift;
 import org.firstinspires.ftc.teamcode.hw.MyIMU;
-import org.firstinspires.ftc.teamcode.hw.WebCam;
 import org.firstinspires.ftc.teamcode.pathmaker.PathDetails;
 import org.firstinspires.ftc.teamcode.pathmaker.PathMakerStateMachine;
 import org.firstinspires.ftc.teamcode.pathmaker.PathManager;
@@ -46,7 +45,6 @@ public class Auto_Robot1 extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        WebCam.init(this, telemetry);
 
         Lift lift = new Lift(hardwareMap.get(DcMotor.class, "leftLift"),
                 hardwareMap.get(DcMotor.class, "rightLift"),
@@ -130,8 +128,6 @@ public class Auto_Robot1 extends LinearOpMode {
                             PathManager.v_ramp));
 
                     MyIMU.updateTelemetry(telemetry);
-                    telemetry.addData("webcam", WebCam.webcamMessage);
-                    WebCam.telemetryAprilTag(telemetry);
                     telemetry.update();
                     cycles = 0;
                 }
