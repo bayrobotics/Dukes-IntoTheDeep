@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.pathmaker;
 
+import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.bucketFieldDelay_ms;
+import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.bucketPosition;
+import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.intakePosition;
+import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.liftFieldDelay_ms;
 import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.liftHeight;
 import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.liftPower;
 
@@ -7,6 +11,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.components.Intake;
 import org.firstinspires.ftc.teamcode.hw.DriveTrain;
 import org.firstinspires.ftc.teamcode.op.RobotPose;
 import org.firstinspires.ftc.teamcode.components.Lift;
@@ -26,11 +31,12 @@ public class PathMakerStateMachine {
         TELEOP, AUTONOMOUS
     }   // end enum GameMode
     enum PM_STATE {
-        INIT, IDLE, DONE, DRIVER_CONTROL,AUTO_SET_PATH, AUTO_NEXT_PATH, AUTO_APRILTAG_ExecutePath, AUTO_ExecutePath, CONTROL_LIFT, CONTROL_INTAKE
+        INIT, IDLE, DONE, DRIVER_CONTROL,AUTO_SET_PATH, AUTO_NEXT_PATH, AUTO_APRILTAG_ExecutePath, AUTO_ExecutePath, CONTROL_LIFT_AND_INTAKE
     }   // end enum State
 
     public static PM_STATE pm_state;
     public static CONTROL_MODE control_mode;
+    public static GameSetup.Terminal terminal = GameSetup.Terminal.CLOSE;
     public static boolean aprilTagDetectionOn = false;
     public static int aprilTagDetectionID = 0;
     public static int currentPath = -1, nextPath = -1;
@@ -155,17 +161,23 @@ public class PathMakerStateMachine {
     //
     // Autonomous section
     //
-    public static void updateAuto(Telemetry telemetry, Lift lift) throws InterruptedException {
+    public static void updateAuto(Telemetry telemetry, Lift lift, Intake intake) throws InterruptedException {
         RobotPose.readPose(); // read pose once per auto loop (moved here from PathManager)
         // process state
         switch (pm_state) {
             case AUTO_SET_PATH:
-                PathDetails.setPath(PathDetails.autoPathList.get(nextPath),telemetry);
+                if(terminal == GameSetup.Terminal.CLOSE) {
+                    PathDetails.setPath(PathDetails.autoPathList.get(nextPath), telemetry);
+                } else if(terminal == GameSetup.Terminal.FAR) {
+                    PathDetails.setPath(PathDetails.autoPathListTwo.get(nextPath), telemetry);
+                }
                 break;
             case IDLE:
                 break;
             case DONE:
                 powerDown();
+                intake.moveIntake(0);
+                lift.setLiftPower(0);
                 break;
             default:
                 break;
@@ -191,17 +203,44 @@ public class PathMakerStateMachine {
                     pm_state = PM_STATE.AUTO_SET_PATH;
                 }
                 break;
-            case CONTROL_LIFT:
+            case CONTROL_LIFT_AND_INTAKE:
+
                 PathManager.moveRobot();
-                lift.moveTo(liftHeight, liftPower);
+                double intakePower = 0;
+
+
+                if(intakePosition == Intake.IntakePosition.UP) {
+                    intakePower = 1;
+                } else if(intakePosition == Intake.IntakePosition.DOWN) {
+                    intakePower = -1;
+                }
+
+
                 if(Math.abs(lift.getHeight() - liftHeight) < 50) {
                     liftPower = 0;
-                } else {
+                } else if(Math.abs(lift.getHeight() - liftHeight) < 100) {
                     liftPower = 0.25;
+                } else if(Math.abs(lift.getHeight() - liftHeight) < 800) {
+                    liftPower = 0.5;
+                } else {
+                    liftPower = 1;
                 }
-                break;
-            case CONTROL_INTAKE:
-                PathManager.moveRobot();
+
+                if(PathDetails.elapsedTime_ms.milliseconds() >= liftFieldDelay_ms) {
+                    lift.moveTo(liftHeight, liftPower);
+                } else {
+                    liftPower = 0;
+                }
+
+                intake.moveToPosition(intakePosition);
+
+                if(PathDetails.elapsedTime_ms.milliseconds() >= bucketFieldDelay_ms) {
+                    lift.moveBucket(bucketPosition);
+                }
+
+                if(intake.moveIntake(intakePower) && lift.moveTo(liftHeight, liftPower) && PathManager.inTargetZone && lift.moveBucket(bucketPosition)) {
+                    pm_state = PM_STATE.AUTO_NEXT_PATH;
+                }
                 break;
         }   // end switch (state)
     }   // end method update

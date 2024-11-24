@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode.components;
 
+import android.app.usage.NetworkStats;
+
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -13,17 +17,16 @@ public class Lift extends RobotComponent {
     public Lift(DcMotor leftLift,
                 DcMotor rightLift,
                 TouchSensor bottomSwitch,
-                // DcMotor bucket,
+                DcMotor bucket,
                 Telemetry telemetry) {
 
         this.telemetry = telemetry;
         this.bottomSwitch = bottomSwitch;
-        // this.bucket = bucket;
+        this.bucket = bucket;
         this.leftLift = leftLift;
         this.rightLift = rightLift;
         initMotor(this.leftLift, DcMotor.Direction.REVERSE);
         initMotor(this.rightLift, DcMotor.Direction.FORWARD);
-        // initMotor(this.bucket, DcMotorSimple.Direction.FORWARD);
 
     }
 
@@ -33,6 +36,10 @@ public class Lift extends RobotComponent {
 
     public enum LiftState {
         STOPPED, MOVING
+    }
+
+    public enum BucketState {
+        DOWN, DUMP
     }
 
     public void updateState(Gamepad gamepad, Gamepad gamepad2) {
@@ -78,7 +85,7 @@ public class Lift extends RobotComponent {
         } else if(gamepad2.dpad_up) {
 
             if(liftMode == LiftMode.MANUAL) {
-                setLiftPower(1);
+                setLiftPower(0.5);
             }
             else if(liftMode == LiftMode.PRESET) {
                 moveTo(2300, 0.5);
@@ -93,7 +100,7 @@ public class Lift extends RobotComponent {
         } else if(gamepad2.dpad_down) {
 
             if(liftMode == LiftMode.MANUAL) {
-                setLiftPower(-1);
+                setLiftPower(-0.5);
             } else if(liftMode == LiftMode.PRESET) {
                 moveTo(0, 0.5);
             }
@@ -105,17 +112,20 @@ public class Lift extends RobotComponent {
             }
         }
 
-        /*
-        if(gamepad.b) {
-            bucket.setPower(-1);
-        } else if(gamepad.x) {
-            bucket.setPower(1);
+
+        if(gamepad2.b) {
+            // bucketState = BucketState.DOWN;
+            bucket.setPower(-0.3);
+        } else if(gamepad2.x) {
+            // bucketState = BucketState.DUMP;
+            bucket.setPower(0.3);
         } else {
             bucket.setPower(0);
         }
+        // moveBucket(bucketState);
 
 
-         */
+
 
         telemetry.addData("Lift Encoder Value: ", leftLift.getCurrentPosition());
         telemetry.addData("Lift Mode", liftMode);
@@ -124,8 +134,6 @@ public class Lift extends RobotComponent {
         telemetry.addData("Target Position", leftLift.getTargetPosition());
         telemetry.addData("Left Power", leftLift.getPower());
         telemetry.addData("Right Power", rightLift.getPower());
-        // telemetry.addData("Bucket Motor Power", bucket.getPower());
-        telemetry.update();
 
     }
 
@@ -149,20 +157,53 @@ public class Lift extends RobotComponent {
 
     }
 
-    public void moveTo(int target, double power) {
+    public boolean moveTo(int target, double power) {
 
+        boolean atPosition = false;
         leftLift.setTargetPosition(target);
+
+        if(Math.abs(leftLift.getCurrentPosition() - leftLift.getTargetPosition()) <= 50) {
+            atPosition = true;
+        }
 
         if(leftLift.getTargetPosition() >= leftLift.getCurrentPosition()) {
             setLiftPower(power);
         } else {
             setLiftPower(-power);
         }
+
+        return atPosition;
+
     }
 
     public int getHeight() {
         return leftLift.getCurrentPosition();
     }
+
+    // old code (might need to use again soon)
+    public boolean moveBucket(BucketState bucketState) {
+
+        boolean atPosition = false;
+
+        /*
+        if(bucketState == BucketState.DOWN) {
+            bucket.setPosition(0);
+        } else if(bucketState == BucketState.DUMP) {
+            bucket.setPosition(0.5);
+        }
+
+        if(bucketState == BucketState.DOWN && bucket.getPosition() == 0) {
+            atPosition = true;
+        } else if(bucketState == BucketState.DUMP && bucket.getPosition() == 1) {
+            atPosition = true;
+        }
+
+         */
+
+        return atPosition;
+    }
+
+
 
 
 
@@ -170,8 +211,9 @@ public class Lift extends RobotComponent {
     private LiftState liftState = LiftState.STOPPED;
     private DcMotor leftLift;
     private DcMotor rightLift;
-    // private DcMotor bucket;
+    private DcMotor bucket;
     private TouchSensor bottomSwitch;
+    private BucketState bucketState = BucketState.DOWN;
 
 
     private void initMotor(DcMotor motor, DcMotor.Direction motorDirection) {

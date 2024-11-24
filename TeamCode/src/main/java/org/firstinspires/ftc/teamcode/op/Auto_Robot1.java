@@ -15,13 +15,17 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.components.Intake;
 import org.firstinspires.ftc.teamcode.components.Lift;
 import org.firstinspires.ftc.teamcode.hw.MyIMU;
+import org.firstinspires.ftc.teamcode.pathmaker.GameSetup;
 import org.firstinspires.ftc.teamcode.pathmaker.PathDetails;
 import org.firstinspires.ftc.teamcode.pathmaker.PathMakerStateMachine;
 import org.firstinspires.ftc.teamcode.pathmaker.PathManager;
@@ -39,6 +43,7 @@ public class Auto_Robot1 extends LinearOpMode {
     public static int runTest_ms = 100;
     public static int thisNumberSteps = 2;
     public static int setZone = 1;
+    public static GameSetup.Terminal terminal = GameSetup.Terminal.CLOSE;
 
     DriveTrain driveTrain = new DriveTrain(this);
 
@@ -49,11 +54,23 @@ public class Auto_Robot1 extends LinearOpMode {
         Lift lift = new Lift(hardwareMap.get(DcMotor.class, "leftLift"),
                 hardwareMap.get(DcMotor.class, "rightLift"),
                 hardwareMap.get(TouchSensor.class, "bottomSwitch"),
-                // hardwareMap.get(DcMotor.class, "bucket"),
+                hardwareMap.get(DcMotor.class, "bucket"),
+                telemetry);
+
+        Intake intake = new Intake(hardwareMap.get(CRServo.class, "intakeLift"),
+                hardwareMap.get(CRServo.class, "spinner"),
+                hardwareMap.get(TouchSensor.class, "upStop"),
+                hardwareMap.get(TouchSensor.class, "bottomStop"),
+                hardwareMap.get(Servo.class, "leftExtender"),
+                hardwareMap.get(Servo.class, "rightExtender"),
                 telemetry);
 
         RobotPose.initializePose(this, driveTrain, telemetry);
-        RobotPose.setPose(63, 12, 270);
+        if(terminal == GameSetup.Terminal.CLOSE) {
+            RobotPose.setPose(63, -36, 270);
+        } else if(terminal == GameSetup.Terminal.FAR) {
+            RobotPose.setPose(63, 12, 270);
+        }
 
         MyIMU.init(this);
         MyIMU.updateTelemetry(telemetry);
@@ -131,7 +148,7 @@ public class Auto_Robot1 extends LinearOpMode {
                     telemetry.update();
                     cycles = 0;
                 }
-                PathMakerStateMachine.updateAuto(telemetry, lift);
+                PathMakerStateMachine.updateAuto(telemetry, lift, intake);
             }
         }
     }

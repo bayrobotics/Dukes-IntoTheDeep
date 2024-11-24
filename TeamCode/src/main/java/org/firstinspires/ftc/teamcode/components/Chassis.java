@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.components;
 
+import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.liftHeight;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -7,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Chassis extends RobotComponent {
 
     public Telemetry telemetry;
+    SpeedMode selectedSpeedMode = SpeedMode.NORMAL;
 
     public enum SpeedMode { SLOW, NORMAL, FAST }
 
@@ -32,7 +35,8 @@ public class Chassis extends RobotComponent {
     }
 
     public void updateState(Gamepad gamepad,Gamepad gamepad2) {
-        SpeedMode selectedSpeedMode = SpeedMode.NORMAL;
+
+
         double lateral = gamepad.left_stick_x;
         double forward = gamepad.left_stick_y;
         double rotation = gamepad.right_stick_x;
@@ -41,11 +45,15 @@ public class Chassis extends RobotComponent {
 
         boolean fastmode = false;
 
+        if(liftHeight > 100 && selectedSpeedMode == SpeedMode.FAST) {
+            selectedSpeedMode = SpeedMode.NORMAL;
+        }
+
         if (gamepad.b) {
             if (fastmode) {
                 selectedSpeedMode = SpeedMode.NORMAL;
             }
-            else {
+            else if(liftHeight < 100){
                 selectedSpeedMode = SpeedMode.FAST;
             }
         }
@@ -70,7 +78,7 @@ public class Chassis extends RobotComponent {
         if(gamepad.left_bumper && !gamepad.right_bumper) {
             selectedSpeedMode = SpeedMode.SLOW;
         }
-        else if (gamepad.right_bumper && !gamepad.left_bumper) {
+        else if (gamepad.right_bumper && !gamepad.left_bumper && liftHeight <= 100) {
             selectedSpeedMode = SpeedMode.FAST;
         }
         this.setSpeedMode(selectedSpeedMode);

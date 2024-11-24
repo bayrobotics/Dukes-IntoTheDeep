@@ -28,12 +28,17 @@ public class TeleOpMode extends LinearOpMode {
                 hardwareMap.get(DcMotor.class, "back_left"), DcMotor.Direction.REVERSE, telemetry);
 
         Intake intake = new Intake(hardwareMap.get(CRServo.class, "intakeLift"),
-                hardwareMap.get(CRServo.class, "spinner"));
+                hardwareMap.get(CRServo.class, "spinner"),
+                hardwareMap.get(TouchSensor.class, "upStop"),
+                hardwareMap.get(TouchSensor.class, "bottomStop"),
+                hardwareMap.get(Servo.class, "leftExtender"),
+                hardwareMap.get(Servo.class, "rightExtender"),
+                telemetry);
 
         Lift lift = new Lift(hardwareMap.get(DcMotor.class, "leftLift"),
         hardwareMap.get(DcMotor.class, "rightLift"),
         hardwareMap.get(TouchSensor.class, "bottomSwitch"),
-        // hardwareMap.get(DcMotor.class, "bucket"),
+        hardwareMap.get(DcMotor.class, "bucket"),
                 telemetry);
 
         List<RobotComponent> components = new LinkedList<RobotComponent>();
@@ -44,6 +49,7 @@ public class TeleOpMode extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+
 
             chassis.setChassisSpeed(1.0);
 
