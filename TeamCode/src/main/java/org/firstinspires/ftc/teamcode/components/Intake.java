@@ -75,7 +75,7 @@ public class Intake extends RobotComponent{
 
         boolean atPosition = false;
 
-        if(upStop.isPressed() && power > 0) {
+        if(upStop.isPressed() && power >= 0) {
             power = 0;
             atPosition = true;
         } else if(bottomStop.isPressed() && power < 0) {

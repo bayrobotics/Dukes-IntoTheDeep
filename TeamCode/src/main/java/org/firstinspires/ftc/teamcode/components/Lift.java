@@ -17,16 +17,18 @@ public class Lift extends RobotComponent {
     public Lift(DcMotor leftLift,
                 DcMotor rightLift,
                 TouchSensor bottomSwitch,
-                DcMotor bucket,
+                DcMotor slide,
                 Telemetry telemetry) {
 
         this.telemetry = telemetry;
         this.bottomSwitch = bottomSwitch;
-        this.bucket = bucket;
+        this.slide = slide;
         this.leftLift = leftLift;
         this.rightLift = rightLift;
         initMotor(this.leftLift, DcMotor.Direction.REVERSE);
         initMotor(this.rightLift, DcMotor.Direction.FORWARD);
+        slide.setTargetPosition(0);
+        slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
     }
 
@@ -38,8 +40,8 @@ public class Lift extends RobotComponent {
         STOPPED, MOVING
     }
 
-    public enum BucketState {
-        DOWN, DUMP
+    public enum SlidePosition {
+        DOWN, INTAKE, HIGH_BASKET
     }
 
     public void updateState(Gamepad gamepad, Gamepad gamepad2) {
@@ -114,15 +116,12 @@ public class Lift extends RobotComponent {
 
 
         if(gamepad2.b) {
-            // bucketState = BucketState.DOWN;
-            bucket.setPower(-0.3);
+            slide.setPower(-0.3);
         } else if(gamepad2.x) {
-            // bucketState = BucketState.DUMP;
-            bucket.setPower(0.3);
+            slide.setPower(0.3);
         } else {
-            bucket.setPower(0);
+            slide.setPower(0);
         }
-        // moveBucket(bucketState);
 
 
 
@@ -134,6 +133,10 @@ public class Lift extends RobotComponent {
         telemetry.addData("Target Position", leftLift.getTargetPosition());
         telemetry.addData("Left Power", leftLift.getPower());
         telemetry.addData("Right Power", rightLift.getPower());
+        telemetry.addData("Slide Position ", slide.getCurrentPosition());
+        telemetry.addData("Slide Power", slide.getPower());
+        telemetry.addData("Slide target position", slide.getTargetPosition());
+        telemetry.update();
 
     }
 
@@ -180,25 +183,26 @@ public class Lift extends RobotComponent {
         return leftLift.getCurrentPosition();
     }
 
-    // old code (might need to use again soon)
-    public boolean moveBucket(BucketState bucketState) {
+    public boolean moveBucket(SlidePosition position, double power) {
 
         boolean atPosition = false;
 
-        /*
-        if(bucketState == BucketState.DOWN) {
-            bucket.setPosition(0);
-        } else if(bucketState == BucketState.DUMP) {
-            bucket.setPosition(0.5);
+        if(position == SlidePosition.DOWN) {
+            slide.setTargetPosition(0);
+        } else if(position == SlidePosition.INTAKE) {
+            slide.setTargetPosition(-200);
+        } else if(position == SlidePosition.HIGH_BASKET) {
+            slide.setTargetPosition(-1200);
         }
 
-        if(bucketState == BucketState.DOWN && bucket.getPosition() == 0) {
+        if(Math.abs(slide.getCurrentPosition() - slide.getTargetPosition()) <= 50) {
+            slide.setPower(0);
             atPosition = true;
-        } else if(bucketState == BucketState.DUMP && bucket.getPosition() == 1) {
-            atPosition = true;
+        } else if(slide.getCurrentPosition() < slide.getTargetPosition()) {
+            slide.setPower(power);
+        } else {
+            slide.setPower(-power);
         }
-
-         */
 
         return atPosition;
     }
@@ -211,9 +215,9 @@ public class Lift extends RobotComponent {
     private LiftState liftState = LiftState.STOPPED;
     private DcMotor leftLift;
     private DcMotor rightLift;
-    private DcMotor bucket;
+    private DcMotor slide;
     private TouchSensor bottomSwitch;
-    private BucketState bucketState = BucketState.DOWN;
+    private SlidePosition slidePosition = SlidePosition.DOWN;
 
 
     private void initMotor(DcMotor motor, DcMotor.Direction motorDirection) {

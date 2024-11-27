@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.pathmaker;
 
 import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.bucketFieldDelay_ms;
-import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.bucketPosition;
+import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.slidePosition;
 import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.intakePosition;
 import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.liftFieldDelay_ms;
 import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.liftHeight;
@@ -234,11 +234,12 @@ public class PathMakerStateMachine {
 
                 intake.moveToPosition(intakePosition);
 
+                boolean bucketAtPosition = false;
                 if(PathDetails.elapsedTime_ms.milliseconds() >= bucketFieldDelay_ms) {
-                    lift.moveBucket(bucketPosition);
+                    bucketAtPosition = lift.moveBucket(slidePosition, 0.3);
                 }
 
-                if(intake.moveIntake(intakePower) && lift.moveTo(liftHeight, liftPower) && PathManager.inTargetZone && lift.moveBucket(bucketPosition)) {
+                if(intake.moveIntake(intakePower) && lift.moveTo(liftHeight, liftPower) && PathManager.inTargetZone && bucketAtPosition) {
                     pm_state = PM_STATE.AUTO_NEXT_PATH;
                 }
                 break;

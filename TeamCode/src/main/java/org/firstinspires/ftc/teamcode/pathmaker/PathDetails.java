@@ -55,10 +55,10 @@ public class PathDetails {
     public static ElapsedTime elapsedTime_ms = new ElapsedTime();
     public static double pathTime_ms = 0;
     public  static PathMakerStateMachine.PM_STATE PMSMstate;
-    public static int liftHeight = 5000;
+    public static int liftHeight = 0;
     public static double liftPower = 0.5;
-    public static IntakePosition intakePosition = IntakePosition.MOVING;
-    public static Lift.BucketState bucketPosition = Lift.BucketState.DOWN;
+    public static IntakePosition intakePosition = IntakePosition.UP;
+    public static Lift.SlidePosition slidePosition = Lift.SlidePosition.DOWN;
 
     public static double lastTurnGoal;
 
@@ -75,11 +75,11 @@ public class PathDetails {
         PathManager.powerScalingTurn = 1;
         PathManager.maxPowerStepUp = 0.1;
         PathManager.inTargetZone = false;
-        PathManager.yTargetZone_in = 1;
-        PathManager.xTargetZone_in = 1;
+        PathManager.yTargetZone_in = 2;
+        PathManager.xTargetZone_in = 2;
         PathManager.turnTargetZone_deg = 1;
-        PathManager.yRampReach_in = 4;
-        PathManager.xRampReach_in = 4;
+        PathManager.yRampReach_in = 6;
+        PathManager.xRampReach_in = 6;
         PathManager.turnRampReach_deg = 20;
         PathManager.yMinVelocity_InchPerSec = 2;
         PathManager.xMinVelocity_InchPerSec = 2;
@@ -94,7 +94,7 @@ public class PathDetails {
     }
     public enum Path {
         // Each path is labeled with a name as defined in this enum
-        P1, P2, P3, P4,
+        P0, P1, P2, P3, P4,
         FP1, FP2, FP3, FP4,FP5, FP6, FP7,
         DRIVER_CONTROLLED,
         DONE
@@ -108,10 +108,11 @@ public class PathDetails {
         PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
         autoPathList = new ArrayList<PathDetails.Path>();
         autoPathListTwo = new ArrayList<PathDetails.Path>();
+        // autoPathList.add(PathDetails.Path.P0);
         autoPathList.add(PathDetails.Path.P1);
         autoPathList.add(PathDetails.Path.P2);
         autoPathList.add(PathDetails.Path.P3);
-        autoPathList.add(PathDetails.Path.P4);
+        // autoPathList.add(PathDetails.Path.P4);
         autoPathListTwo.add(PathDetails.Path.FP1);
         autoPathListTwo.add(PathDetails.Path.FP2);
         autoPathListTwo.add(PathDetails.Path.FP3);
@@ -134,6 +135,14 @@ public class PathDetails {
                 PathManager.turnTargetZone_deg = 3;
                 powerScaling = 1;
                 break;
+            case P0:
+                PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
+                PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.CONTROL_LIFT_AND_INTAKE;
+                slidePosition = Lift.SlidePosition.HIGH_BASKET;
+                powerScaling = 0.5;
+                xFieldGoal_in = 63; yFieldGoal_in = -36; aFieldGoal_deg = 270;
+                calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
+                break;
             case P1:
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.CONTROL_LIFT_AND_INTAKE;
@@ -147,17 +156,17 @@ public class PathDetails {
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.CONTROL_LIFT_AND_INTAKE;
                 powerScaling = 0.5;
-                bucketPosition = Lift.BucketState.DUMP;
+                slidePosition = Lift.SlidePosition.HIGH_BASKET;
                 xFieldGoal_in = 56; yFieldGoal_in = -60; aFieldGoal_deg = 315;
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
             case P3:
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.CONTROL_LIFT_AND_INTAKE;
-                liftFieldDelay_ms = 5000;
-                bucketFieldDelay_ms = 5000;
+                liftFieldDelay_ms = 2000;
+                bucketFieldDelay_ms = 1000;
                 powerScaling = 0.5;
-                bucketPosition = Lift.BucketState.DOWN;
+                slidePosition = Lift.SlidePosition.DOWN;
                 liftPower = 1;
                 liftHeight = 0;
                 xFieldGoal_in = 56; yFieldGoal_in = -60; aFieldGoal_deg = 315;
@@ -207,7 +216,6 @@ public class PathDetails {
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.CONTROL_LIFT_AND_INTAKE;
                 powerScaling = 1;
-                liftHeight = 2300;
                 xFieldGoal_in = 56; yFieldGoal_in = -60; aFieldGoal_deg = 315;
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
@@ -215,7 +223,7 @@ public class PathDetails {
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.CONTROL_LIFT_AND_INTAKE;
                 powerScaling = 1;
-                bucketPosition = Lift.BucketState.DUMP;
+                slidePosition = Lift.SlidePosition.HIGH_BASKET;
                 liftFieldDelay_ms = 3000;
                 liftHeight = 1200;
                 xFieldGoal_in = 56; yFieldGoal_in = -60; aFieldGoal_deg = 315;
@@ -227,7 +235,7 @@ public class PathDetails {
                 powerScaling = 1;
                 liftFieldDelay_ms = 500;
                 liftHeight = 0;
-                bucketPosition = Lift.BucketState.DOWN;
+                slidePosition = Lift.SlidePosition.DOWN;
                 xFieldGoal_in = 60; yFieldGoal_in = 60; aFieldGoal_deg = 270;
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
