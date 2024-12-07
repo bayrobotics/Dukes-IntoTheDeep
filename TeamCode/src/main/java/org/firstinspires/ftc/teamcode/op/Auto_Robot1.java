@@ -51,6 +51,10 @@ public class Auto_Robot1 extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
+
+
+
+
         Lift lift = new Lift(hardwareMap.get(DcMotor.class, "leftLift"),
                 hardwareMap.get(DcMotor.class, "rightLift"),
                 hardwareMap.get(TouchSensor.class, "bottomSwitch"),
