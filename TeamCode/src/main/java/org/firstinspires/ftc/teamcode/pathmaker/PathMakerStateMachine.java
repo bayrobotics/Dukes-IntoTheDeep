@@ -6,6 +6,8 @@ import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.intakePositio
 import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.liftFieldDelay_ms;
 import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.liftHeight;
 import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.liftPower;
+import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.slidePower;
+import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.spinPower;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -36,7 +38,7 @@ public class PathMakerStateMachine {
 
     public static PM_STATE pm_state;
     public static CONTROL_MODE control_mode;
-    public static GameSetup.Terminal terminal = GameSetup.Terminal.CLOSE;
+    public static GameSetup.Terminal terminal = GameSetup.Terminal.FAR;
     public static boolean aprilTagDetectionOn = false;
     public static int aprilTagDetectionID = 0;
     public static int currentPath = -1, nextPath = -1;
@@ -136,7 +138,7 @@ public class PathMakerStateMachine {
             // auto heading
             // keep robot heading the same direction if no turn input
             // this counteracts rotational drifting of the robot
-            if (switchToAutonomousTimer.milliseconds() < 200 && fromManualToAutoHeading) {
+            if (switchToAutonomousTimer.milliseconds() < 400 && fromManualToAutoHeading) {
                 // need to wait long enough to get one or heading readings
                 // increase 200 to 400 ms for heavy robot (more inertia)
                 // before switching to autonomous mode to avoid bounce back
@@ -233,10 +235,11 @@ public class PathMakerStateMachine {
                 }
 
                 intake.moveToPosition(intakePosition);
+                intake.spin(spinPower);
 
                 boolean bucketAtPosition = false;
                 if(PathDetails.elapsedTime_ms.milliseconds() >= bucketFieldDelay_ms) {
-                    bucketAtPosition = lift.moveBucket(slidePosition, 0.3);
+                    bucketAtPosition = lift.moveBucket(slidePosition, slidePower);
                 }
 
                 if(intake.moveIntake(intakePower) && lift.moveTo(liftHeight, liftPower) && PathManager.inTargetZone && bucketAtPosition) {

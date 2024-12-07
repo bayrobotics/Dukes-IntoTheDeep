@@ -23,6 +23,7 @@ public class Lift extends RobotComponent {
         this.telemetry = telemetry;
         this.bottomSwitch = bottomSwitch;
         this.slide = slide;
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.leftLift = leftLift;
         this.rightLift = rightLift;
         initMotor(this.leftLift, DcMotor.Direction.REVERSE);
@@ -32,12 +33,8 @@ public class Lift extends RobotComponent {
 
     }
 
-    public enum LiftMode {
-        MANUAL, PRESET
-    }
-
     public enum LiftState {
-        STOPPED, MOVING
+      LIFT_START, LIFT_WAIT_FOR_INTAKE, LIFT_EXTEND, LIFT_DUMP
     }
 
     public enum SlidePosition {
@@ -49,93 +46,93 @@ public class Lift extends RobotComponent {
         if(bottomSwitch.isPressed()) {
             leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
+        leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-
-        if(liftMode == LiftMode.PRESET) {
-            leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
-        else if(liftMode == LiftMode.MANUAL) {
-            leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        }
-
-
-        if(liftMode == LiftMode.PRESET && liftState == liftState.MOVING) {
-            if(!leftLift.isBusy()) {
-                setLiftPower(0);
-            }
+        if(Math.abs(gamepad2.left_stick_y) > 0.2) {
+            setLiftPower(-gamepad2.left_stick_y);
+            manualLiftControl = true;
+        } else if(manualLiftControl == true) {
+            setLiftPower(0);
         }
 
-        if(liftMode == LiftMode.PRESET && liftState == liftState.STOPPED) {
-            if(leftLift.getCurrentPosition() - leftLift.getTargetPosition() < -20) {
-                moveTo(leftLift.getTargetPosition(), 0.2);
-            }
-        }
-
-
-        if(gamepad2.dpad_left) {
-
-            if(liftMode == LiftMode.MANUAL) {
-                liftMode = LiftMode.PRESET;
-            } else if(liftMode == LiftMode.PRESET) {
-                liftMode = LiftMode.MANUAL;
-            }
-
-            if(liftState == LiftState.MOVING) {
-                setLiftPower(0);
-            }
-
-        } else if(gamepad2.dpad_up) {
-
-            if(liftMode == LiftMode.MANUAL) {
-                setLiftPower(0.5);
-            }
-            else if(liftMode == LiftMode.PRESET) {
-                moveTo(2300, 0.5);
-            }
-
-        } else if(gamepad2.dpad_right) {
-
-            if(liftMode == LiftMode.PRESET) {
-                moveTo(1500, 0.5); // 1500 is estimate
-            }
-
-        } else if(gamepad2.dpad_down) {
-
-            if(liftMode == LiftMode.MANUAL) {
-                setLiftPower(-0.5);
-            } else if(liftMode == LiftMode.PRESET) {
-                moveTo(0, 0.5);
-            }
-
-        } else {
-
-            if(liftMode == LiftMode.MANUAL) {
-                setLiftPower(0);
-            }
-        }
-
-
-        if(gamepad2.b) {
-            slide.setPower(-0.3);
-        } else if(gamepad2.x) {
-            slide.setPower(0.3);
-        } else {
+        if(Math.abs(gamepad2.right_stick_y) > 0.2) {
+            slide.setPower(gamepad2.right_stick_y * 0.5);
+            manualLiftControl = true;
+        } else if(manualLiftControl == true) {
             slide.setPower(0);
         }
 
+        if(gamepad2.b) {
+            manualLiftControl = false;
+        }
+
+        /*
+        if(manualLiftControl == false) {
+            switch (liftState) {
+                case LIFT_START:
+                    if (gamepad2.b && !bPressedPrevious) {
+                        liftState = LiftState.LIFT_WAIT_FOR_INTAKE;
+                        bPressedPrevious = true;
+                    } else {
+                        moveBucket(SlidePosition.DOWN, 0.4);
+                        moveTo(0, 0.5);
+                        bPressedPrevious = false;
+                    }
+                    break;
+                case LIFT_WAIT_FOR_INTAKE:
+                    if (gamepad2.b && !bPressedPrevious) {
+                        liftState = LiftState.LIFT_EXTEND;
+                        bPressedPrevious = true;
+                    } else {
+                        moveBucket(SlidePosition.INTAKE, 0.5);
+                        bPressedPrevious = false;
+                    }
+                    break;
+                case LIFT_EXTEND:
+                    if (gamepad2.b && !bPressedPrevious) {
+                        liftState = LiftState.LIFT_DUMP;
+                        bPressedPrevious = true;
+                    } else {
+                        moveBucket(SlidePosition.DOWN, 0.3);
+                        moveTo(2300, 0.7);
+                        bPressedPrevious = false;
+                    }
+                    break;
+                case LIFT_DUMP:
+                    if (gamepad2.b && !bPressedPrevious) {
+                        liftState = LiftState.LIFT_START;
+                        bPressedPrevious = true;
+                    } else {
+                        moveBucket(SlidePosition.HIGH_BASKET, 0.6);
+                        bPressedPrevious = false;
+                    }
+                    break;
+                default:
+                    liftState = LiftState.LIFT_START;
+            }
+        }
+
+        if(gamepad2.b) {
+            bPressedPrevious = true;
+        } else {
+            bPressedPrevious = false;
+        }
+
+         */
 
 
 
+
+        telemetry.addData("Slide Position ", slide.getCurrentPosition());
         telemetry.addData("Lift Encoder Value: ", leftLift.getCurrentPosition());
-        telemetry.addData("Lift Mode", liftMode);
         telemetry.addData("Lift State", liftState);
         telemetry.addData("Left Lift Mode", leftLift.getMode());
         telemetry.addData("Target Position", leftLift.getTargetPosition());
         telemetry.addData("Left Power", leftLift.getPower());
         telemetry.addData("Right Power", rightLift.getPower());
-        telemetry.addData("Slide Position ", slide.getCurrentPosition());
         telemetry.addData("Slide Power", slide.getPower());
         telemetry.addData("Slide target position", slide.getTargetPosition());
+        telemetry.addData("Lift bottom button pressed", bottomSwitch.isPressed());
         telemetry.update();
 
     }
@@ -152,12 +149,6 @@ public class Lift extends RobotComponent {
         leftLift.setPower(power);
         rightLift.setPower(power);
 
-        if(power != 0) {
-            liftState = liftState.MOVING;
-        } else {
-            liftState = liftState.STOPPED;
-        }
-
     }
 
     public boolean moveTo(int target, double power) {
@@ -167,6 +158,11 @@ public class Lift extends RobotComponent {
 
         if(Math.abs(leftLift.getCurrentPosition() - leftLift.getTargetPosition()) <= 50) {
             atPosition = true;
+            power = 0;
+        } else if(Math.abs(leftLift.getCurrentPosition() - leftLift.getTargetPosition()) <= 100) {
+            power = 0.25;
+        } else if(Math.abs(leftLift.getCurrentPosition() - leftLift.getTargetPosition()) <= 300) {
+            power = 0.5;
         }
 
         if(leftLift.getTargetPosition() >= leftLift.getCurrentPosition()) {
@@ -188,9 +184,9 @@ public class Lift extends RobotComponent {
         boolean atPosition = false;
 
         if(position == SlidePosition.DOWN) {
-            slide.setTargetPosition(0);
+            slide.setTargetPosition(-170);
         } else if(position == SlidePosition.INTAKE) {
-            slide.setTargetPosition(-200);
+            slide.setTargetPosition(-300);
         } else if(position == SlidePosition.HIGH_BASKET) {
             slide.setTargetPosition(-1200);
         }
@@ -198,6 +194,11 @@ public class Lift extends RobotComponent {
         if(Math.abs(slide.getCurrentPosition() - slide.getTargetPosition()) <= 50) {
             slide.setPower(0);
             atPosition = true;
+        } else if(Math.abs(slide.getCurrentPosition() - slide.getTargetPosition()) <= 250) {
+            power *= 0.5;
+            if(power < 0.4) {
+                power = 0.4;
+            }
         } else if(slide.getCurrentPosition() < slide.getTargetPosition()) {
             slide.setPower(power);
         } else {
@@ -207,17 +208,14 @@ public class Lift extends RobotComponent {
         return atPosition;
     }
 
-
-
-
-
-    private LiftMode liftMode = LiftMode.MANUAL;
-    private LiftState liftState = LiftState.STOPPED;
+    private LiftState liftState = LiftState.LIFT_START;
     private DcMotor leftLift;
     private DcMotor rightLift;
     private DcMotor slide;
     private TouchSensor bottomSwitch;
     private SlidePosition slidePosition = SlidePosition.DOWN;
+    private boolean bPressedPrevious = false;
+    private boolean manualLiftControl = true;
 
 
     private void initMotor(DcMotor motor, DcMotor.Direction motorDirection) {

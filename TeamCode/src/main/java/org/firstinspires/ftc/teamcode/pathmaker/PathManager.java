@@ -55,7 +55,7 @@ public class PathManager {
     public static double yPower, yPowerLast;
     public static double xPower, xPowerLast;
     public static double turnPower, turnPowerLast;
-    private enum THISDOF {Y, X, TURN} // Degrees of freedom
+    public enum THISDOF {Y, X, TURN} // Degrees of freedom
     public static double deltaIsShouldY=1e99, deltaIsShouldX=1e99, deltaIsShouldAngle=1e99;
     public static boolean inTargetZone = false;
     private static ElapsedTime timer = new ElapsedTime();
@@ -136,7 +136,7 @@ public class PathManager {
         }
     }
 
-    private static double calculateCorrectionPower(THISDOF dof) {
+    public static double calculateCorrectionPower(THISDOF dof) {
         double rampReach;
         double deltaIsShould;
         double power;
@@ -195,7 +195,7 @@ public class PathManager {
                     // within reach value: reduce power proportional to distance to goal
                     power = deltaIsShould / rampReach;
                 } else {
-                    double minPower = 0.2 / powerScaling; // undo scaling for minPower
+                    double minPower = 0.3 / powerScaling; // undo scaling for minPower
                     power = signumIsShould * Math.max(minPower,Math.abs(deltaIsShould / rampReach)); // for the first waitBeforeRamp_ms, use linear ramp
                     if (PathDetails.elapsedTime_ms.milliseconds() > waitBeforeRamp_ms) {
                         double v_abs = Math.max(Math.abs(thisVelocity), minVelocity/2);

@@ -59,9 +59,10 @@ public class PathDetails {
     public static double liftPower = 0.5;
     public static IntakePosition intakePosition = IntakePosition.UP;
     public static Lift.SlidePosition slidePosition = Lift.SlidePosition.DOWN;
+    public static double slidePower = 0.3;
+    public static double spinPower = 0;
 
     public static double lastTurnGoal;
-
     public static void initializePath() {
         // initialize each new path
         pathTime_ms = 9E9;
@@ -78,8 +79,8 @@ public class PathDetails {
         PathManager.yTargetZone_in = 2;
         PathManager.xTargetZone_in = 2;
         PathManager.turnTargetZone_deg = 1;
-        PathManager.yRampReach_in = 6;
-        PathManager.xRampReach_in = 6;
+        PathManager.yRampReach_in = 4;
+        PathManager.xRampReach_in = 4;
         PathManager.turnRampReach_deg = 20;
         PathManager.yMinVelocity_InchPerSec = 2;
         PathManager.xMinVelocity_InchPerSec = 2;
@@ -94,7 +95,7 @@ public class PathDetails {
     }
     public enum Path {
         // Each path is labeled with a name as defined in this enum
-        P0, P1, P2, P3, P4,
+        P0, P1, P2, P3, P4,P5, P6,
         FP1, FP2, FP3, FP4,FP5, FP6, FP7,
         DRIVER_CONTROLLED,
         DONE
@@ -113,13 +114,15 @@ public class PathDetails {
         autoPathList.add(PathDetails.Path.P2);
         autoPathList.add(PathDetails.Path.P3);
         // autoPathList.add(PathDetails.Path.P4);
+        // autoPathList.add(PathDetails.Path.P6);
+        // autoPathList.add(PathDetails.Path.P5);
         autoPathListTwo.add(PathDetails.Path.FP1);
-        autoPathListTwo.add(PathDetails.Path.FP2);
-        autoPathListTwo.add(PathDetails.Path.FP3);
-        autoPathListTwo.add(PathDetails.Path.FP4);
-        autoPathListTwo.add(PathDetails.Path.FP5);
-        autoPathListTwo.add(PathDetails.Path.FP6);
-        autoPathListTwo.add(PathDetails.Path.FP7);
+        // autoPathListTwo.add(PathDetails.Path.FP2);
+        // autoPathListTwo.add(PathDetails.Path.FP3);
+        // autoPathListTwo.add(PathDetails.Path.FP4);
+        // autoPathListTwo.add(PathDetails.Path.FP5);
+        // autoPathListTwo.add(PathDetails.Path.FP6);
+        // autoPathListTwo.add(PathDetails.Path.FP7);
     }   // end method initAuto
 
     public static void setPath(Path path, Telemetry telemetry) throws InterruptedException {
@@ -146,48 +149,76 @@ public class PathDetails {
             case P1:
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.CONTROL_LIFT_AND_INTAKE;
+                pathTime_ms = 7000;
                 liftPower = 1;
                 liftHeight = 2300;
                 powerScaling = 0.5;
+                slidePower = 0.3;
+                bucketFieldDelay_ms = 1000;
+                slidePosition = Lift.SlidePosition.HIGH_BASKET;
+                // intakePosition = IntakePosition.DOWN;
                 xFieldGoal_in = 56; yFieldGoal_in = -60; aFieldGoal_deg = 315;
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
             case P2:
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.CONTROL_LIFT_AND_INTAKE;
-                powerScaling = 0.5;
-                slidePosition = Lift.SlidePosition.HIGH_BASKET;
+                liftPower = 1;
+                slidePower = 0.3;
+                bucketFieldDelay_ms = 1000;
+                liftFieldDelay_ms = 2000;
+                liftHeight = 0;
                 xFieldGoal_in = 56; yFieldGoal_in = -60; aFieldGoal_deg = 315;
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
             case P3:
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.CONTROL_LIFT_AND_INTAKE;
-                liftFieldDelay_ms = 2000;
-                bucketFieldDelay_ms = 1000;
                 powerScaling = 0.5;
-                slidePosition = Lift.SlidePosition.DOWN;
-                liftPower = 1;
-                liftHeight = 0;
-                xFieldGoal_in = 56; yFieldGoal_in = -60; aFieldGoal_deg = 315;
+                yFieldDelay_ms = 3000;
+                xFieldGoal_in = 12; yFieldGoal_in = -24; aFieldGoal_deg = 180;
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
             case P4:
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.CONTROL_LIFT_AND_INTAKE;
                 powerScaling = 1;
+                spinPower = 0;
+                intakePosition = IntakePosition.UP;
+                slidePosition = Lift.SlidePosition.INTAKE;
                 PathManager.yRampReach_in = 24;
                 PathManager.xRampReach_in = 24;
                 xFieldGoal_in = 60; yFieldGoal_in = 60; aFieldGoal_deg = 270;
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
+            case P5:
+                PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
+                PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.CONTROL_LIFT_AND_INTAKE;
+                liftPower = 0.5;
+                powerScaling = 0.5;
+                slidePower = 0.3;
+                slidePosition = Lift.SlidePosition.DOWN;
+                liftHeight = 2300;
+                xFieldGoal_in = 56; yFieldGoal_in = -60; aFieldGoal_deg = 315;
+                calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
+                break;
+            case P6:
+                PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
+                PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.CONTROL_LIFT_AND_INTAKE;
+                liftPower = 0.5;
+                slidePower = 0.3;
+                slidePosition = Lift.SlidePosition.HIGH_BASKET;
+                liftHeight = 2300;
+                xFieldGoal_in = 56; yFieldGoal_in = -60; aFieldGoal_deg = 315;
+                calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
+                break;
             case FP1:
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.CONTROL_LIFT_AND_INTAKE;
-                powerScaling = 1;
+                powerScaling = 0.4;
                 PathManager.yRampReach_in = 12;
                 PathManager.xRampReach_in = 12;
-                xFieldGoal_in = 36; yFieldGoal_in = 12; aFieldGoal_deg = 270;
+                xFieldGoal_in = 60; yFieldGoal_in = 55; aFieldGoal_deg = 270;
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
             case FP2:

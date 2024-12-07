@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.components.Chassis;
 import org.firstinspires.ftc.teamcode.components.Intake;
 import org.firstinspires.ftc.teamcode.components.Lift;
 import org.firstinspires.ftc.teamcode.components.RobotComponent;
+import org.firstinspires.ftc.teamcode.pathmaker.PathMakerStateMachine;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -31,8 +32,10 @@ public class TeleOpMode extends LinearOpMode {
                 hardwareMap.get(CRServo.class, "spinner"),
                 hardwareMap.get(TouchSensor.class, "upStop"),
                 hardwareMap.get(TouchSensor.class, "bottomStop"),
-                hardwareMap.get(Servo.class, "leftExtender"),
-                hardwareMap.get(Servo.class, "rightExtender"),
+                hardwareMap.get(Servo.class, "topLeftExtender"),
+                hardwareMap.get(Servo.class, "topRightExtender"),
+                hardwareMap.get(Servo.class, "bottomLeftExtender"),
+                hardwareMap.get(Servo.class, "bottomRightExtender"),
                 telemetry);
 
         Lift lift = new Lift(hardwareMap.get(DcMotor.class, "leftLift"),

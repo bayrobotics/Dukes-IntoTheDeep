@@ -61,8 +61,10 @@ public class Auto_Robot1 extends LinearOpMode {
                 hardwareMap.get(CRServo.class, "spinner"),
                 hardwareMap.get(TouchSensor.class, "upStop"),
                 hardwareMap.get(TouchSensor.class, "bottomStop"),
-                hardwareMap.get(Servo.class, "leftExtender"),
-                hardwareMap.get(Servo.class, "rightExtender"),
+                hardwareMap.get(Servo.class, "topLeftExtender"),
+                hardwareMap.get(Servo.class, "topRightExtender"),
+                hardwareMap.get(Servo.class, "bottomLeftExtender"),
+                hardwareMap.get(Servo.class, "bottomRightExtender"),
                 telemetry);
 
         RobotPose.initializePose(this, driveTrain, telemetry);

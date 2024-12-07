@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode.components;
 import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.liftHeight;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.pathmaker.PathManager;
 
 public class Chassis extends RobotComponent {
 
@@ -40,15 +42,37 @@ public class Chassis extends RobotComponent {
         double lateral = gamepad.left_stick_x;
         double forward = gamepad.left_stick_y;
         double rotation = gamepad.right_stick_x;
+        if(rotationFlipped) {
+            rotation *= -1;
+        }
+
+        if(gamepad.x && !xPressedPrevious) {
+            changeMotorDirection(frontLeftMotor);
+            changeMotorDirection(frontRightMotor);
+            changeMotorDirection(backLeftMotor);
+            changeMotorDirection(backRightMotor);
+            if(rotationFlipped) {
+                rotationFlipped = false;
+            } else {
+                rotationFlipped = true;
+            }
+
+            xPressedPrevious = true;
+        } else if(!gamepad.x) {
+            xPressedPrevious = false;
+        }
+
+
 
         // Set the speed mode to Slow, Normal, or Fast based on gamepad bumpers.
 
         boolean fastmode = false;
 
         if(liftHeight > 100 && selectedSpeedMode == SpeedMode.FAST) {
-            selectedSpeedMode = SpeedMode.NORMAL;
+            selectedSpeedMode = SpeedMode.SLOW;
         }
 
+        /*
         if (gamepad.b) {
             if (fastmode) {
                 selectedSpeedMode = SpeedMode.NORMAL;
@@ -74,6 +98,9 @@ public class Chassis extends RobotComponent {
                 this.count += 2;
             }
         }
+
+         */
+
 
         if(gamepad.left_bumper && !gamepad.right_bumper) {
             selectedSpeedMode = SpeedMode.SLOW;
@@ -101,7 +128,7 @@ public class Chassis extends RobotComponent {
     public void setSpeedMode(SpeedMode speedMode) {
         switch(speedMode) {
             case SLOW:
-                this.speedMultiplier = 0.2;
+                this.speedMultiplier = 0.4;
                 break;
             case NORMAL:
                 this.speedMultiplier = 0.7;
@@ -126,8 +153,18 @@ public class Chassis extends RobotComponent {
     private double sidewaysMultiplier = 100;
     private double degreesMultiplier = 7;
     private double motorPower = 0;
+    private boolean xPressedPrevious = false;
+    private boolean rotationFlipped = false;
 
 
+
+    private void changeMotorDirection(DcMotor motor) {
+        if(motor.getDirection() == DcMotorSimple.Direction.FORWARD) {
+            motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        } else {
+            motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        }
+    }
 
     private void setFrontLeftPower() {
         this.frontLeftMotor.setPower(this.frontLeftPower * this.speedMultiplier);

@@ -12,15 +12,17 @@ public class Intake extends RobotComponent{
 
     public Telemetry telemetry;
 
-    public Intake(CRServo intakeLift, CRServo spinner, TouchSensor upStop, TouchSensor bottomStop, Servo leftExtender, Servo rightExtender, Telemetry telemetry) {
+    public Intake(CRServo intakeLift, CRServo spinner, TouchSensor upStop, TouchSensor bottomStop, Servo topLeftExtender, Servo topRightExtender, Servo bottomLeftExtender, Servo bottomRightExtender, Telemetry telemetry) {
 
         this.intakeLift = intakeLift;
         this.spinner = spinner;
         this.upStop = upStop;
         this.bottomStop = bottomStop;
         this.telemetry = telemetry;
-        this.leftExtender = leftExtender;
-        this.rightExtender = rightExtender;
+        this.topLeftExtender = topLeftExtender;
+        this.topRightExtender = topRightExtender;
+        this.bottomLeftExtender = bottomLeftExtender;
+        this.bottomRightExtender = bottomRightExtender;
         intakeLift.setDirection(DcMotorSimple.Direction.REVERSE);
 
     }
@@ -31,9 +33,9 @@ public class Intake extends RobotComponent{
 
     public void updateState(Gamepad gamepad, Gamepad gamepad2) {
 
-        if(gamepad2.y) {
+        if(gamepad.y) {
             moveIntake(1);
-        } else if(gamepad2.a) {
+        } else if(gamepad.a) {
             moveIntake(-1);
         } else {
             moveIntake(0);
@@ -47,20 +49,23 @@ public class Intake extends RobotComponent{
             spinner.setPower(0);
         }
 
-        if(gamepad.dpad_down) {
+        if(gamepad2.dpad_down) {
             intakeLift.setPower(-1);
-            extendIntake(0.1, 0.7);
+            extendIntake(0.2, 0.4, 0.35, 0.9);
             intakeLift.setPower(0);
-        } else if(gamepad.dpad_up) {
+        } else if(gamepad2.dpad_up) {
             intakeLift.setPower(1);
-            extendIntake(0.35, 0.5);
+            extendIntake(0.35, 0.7, 0.2, 0.6);
             intakeLift.setPower(0);
         }
 
         telemetry.addData("top intake button", upStop.isPressed());
         telemetry.addData("bottom intake button", bottomStop.isPressed());
-        telemetry.addData("left intake extender", leftExtender.getPosition());
-        telemetry.addData("right intake extender", rightExtender.getPosition());
+        telemetry.addData("spinner power: ", spinner.getPower());
+        telemetry.addData("top left intake extender", topLeftExtender.getPosition());
+        telemetry.addData("top right intake extender", topRightExtender.getPosition());
+        telemetry.addData("bottom left intake extender", bottomLeftExtender.getPosition());
+        telemetry.addData("bottom right intake extender", bottomRightExtender.getPosition());
 
         if(bottomStop.isPressed()) {
             intakePosition = IntakePosition.DOWN;
@@ -103,18 +108,26 @@ public class Intake extends RobotComponent{
 
     }
 
-    public void extendIntake(double leftPosition, double rightPosition) {
+    public void extendIntake(double topLeftPosition, double topRightPosition, double bottomLeftPosition, double bottomRightPosition) {
 
-        leftExtender.setPosition(leftPosition);
-        rightExtender.setPosition(rightPosition);
+        topLeftExtender.setPosition(topLeftPosition);
+        topRightExtender.setPosition(topRightPosition);
+        bottomLeftExtender.setPosition(bottomLeftPosition);
+        bottomRightExtender.setPosition(bottomRightPosition);
+    }
+
+    public void spin(double power) {
+        spinner.setPower(power);
     }
 
     private CRServo intakeLift;
     private CRServo spinner;
     private TouchSensor upStop;
     private TouchSensor bottomStop;
-    private Servo leftExtender;
-    private Servo rightExtender;
+    private Servo topLeftExtender;
+    private Servo topRightExtender;
+    private Servo bottomLeftExtender;
+    private Servo bottomRightExtender;
     private IntakePosition intakePosition = IntakePosition.UP;
 
 }
