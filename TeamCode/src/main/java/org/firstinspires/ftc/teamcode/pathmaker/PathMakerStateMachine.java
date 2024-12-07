@@ -38,7 +38,6 @@ public class PathMakerStateMachine {
 
     public static PM_STATE pm_state;
     public static CONTROL_MODE control_mode;
-    public static GameSetup.Terminal terminal = GameSetup.Terminal.FAR;
     public static boolean aprilTagDetectionOn = false;
     public static int aprilTagDetectionID = 0;
     public static int currentPath = -1, nextPath = -1;
@@ -168,9 +167,9 @@ public class PathMakerStateMachine {
         // process state
         switch (pm_state) {
             case AUTO_SET_PATH:
-                if(terminal == GameSetup.Terminal.CLOSE) {
+                if(GameSetup.terminal == GameSetup.Terminal.CLOSE) {
                     PathDetails.setPath(PathDetails.autoPathList.get(nextPath), telemetry);
-                } else if(terminal == GameSetup.Terminal.FAR) {
+                } else if(GameSetup.terminal == GameSetup.Terminal.FAR) {
                     PathDetails.setPath(PathDetails.autoPathListTwo.get(nextPath), telemetry);
                 }
                 break;

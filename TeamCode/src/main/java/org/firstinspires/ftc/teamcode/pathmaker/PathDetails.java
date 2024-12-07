@@ -111,8 +111,8 @@ public class PathDetails {
         autoPathListTwo = new ArrayList<PathDetails.Path>();
         // autoPathList.add(PathDetails.Path.P0);
         autoPathList.add(PathDetails.Path.P1);
-        autoPathList.add(PathDetails.Path.P2);
-        autoPathList.add(PathDetails.Path.P3);
+        // autoPathList.add(PathDetails.Path.P2);
+        // autoPathList.add(PathDetails.Path.P3);
         // autoPathList.add(PathDetails.Path.P4);
         // autoPathList.add(PathDetails.Path.P6);
         // autoPathList.add(PathDetails.Path.P5);

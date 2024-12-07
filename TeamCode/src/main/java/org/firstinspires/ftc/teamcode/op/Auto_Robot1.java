@@ -72,11 +72,7 @@ public class Auto_Robot1 extends LinearOpMode {
                 telemetry);
 
         RobotPose.initializePose(this, driveTrain, telemetry);
-        if(terminal == GameSetup.Terminal.CLOSE) {
             RobotPose.setPose(63, -36, 270);
-        } else if(terminal == GameSetup.Terminal.FAR) {
-            RobotPose.setPose(63, 12, 270);
-        }
 
         MyIMU.init(this);
         MyIMU.updateTelemetry(telemetry);
