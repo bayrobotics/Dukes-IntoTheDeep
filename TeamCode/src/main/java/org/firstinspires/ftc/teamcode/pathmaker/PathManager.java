@@ -48,7 +48,7 @@ public class PathManager {
     public static double xRampReach_in = 12;
     public static double turnRampReach_deg = 45;
     public static double waitBeforeRamp_ms = 300;
-    public static double xTargetZone_in = 1, yTargetZone_in = 1, turnTargetZone_deg = 1;
+    public static double xTargetZone_in = 1.5, yTargetZone_in = 1.5, turnTargetZone_deg = 15;
     public static double xMinVelocity_InchPerSec = 5, yMinVelocity_InchPerSec = 5, turnMinVelocity_degPerSec = 5, v_ramp = 1;
     public static double minPower, xMinPower = 0.2, yMinPower = 0.2, turnMinPower = 0.2;
     public static double powerScalingXY = 1, powerScalingTurn = 1, powerScaling;
@@ -195,12 +195,11 @@ public class PathManager {
                     // within reach value: reduce power proportional to distance to goal
                     power = deltaIsShould / rampReach;
                 } else {
-                    double minPower = 0.3 / powerScaling; // undo scaling for minPower
+                    double minPower = 0 / powerScaling; // undo scaling for minPower
                     power = signumIsShould * Math.max(minPower,Math.abs(deltaIsShould / rampReach)); // for the first waitBeforeRamp_ms, use linear ramp
                     if (PathDetails.elapsedTime_ms.milliseconds() > waitBeforeRamp_ms) {
                         double v_abs = Math.max(Math.abs(thisVelocity), minVelocity/2);
-                        v_ramp = minVelocity / v_abs;
-                        v_ramp = Math.max(v_ramp, 0.9);
+                        v_ramp = minVelocity / v_abs;v_ramp = Math.max(v_ramp, 0.9);
                         v_ramp = Math.min(v_ramp, 1.1);
                         power *= v_ramp;
                     }
@@ -223,7 +222,7 @@ public class PathManager {
                     // within reach value: reduce power proportional to distance to goal
                     power = initialPowerSignum*Math.max(minPower/powerScaling,Math.abs(deltaIsShould/rampReach));
                 } else {
-                    double minPower = 0.2 / powerScaling; // undo scaling for minPower
+                    double minPower = 0.3 / powerScaling; // undo scaling for minPower
                     power = signumIsShould * Math.max(minPower,Math.abs(deltaIsShould / absRampReach)); // for the first waitBeforeRamp_ms, use linear ramp
                     if (PathDetails.elapsedTime_ms.milliseconds() > waitBeforeRamp_ms) {
                         double v_abs = Math.max(Math.abs(thisVelocity), minVelocity/2);

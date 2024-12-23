@@ -22,8 +22,8 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.components.Intake;
-import org.firstinspires.ftc.teamcode.components.Lift;
+import org.firstinspires.ftc.teamcode.hw.Intake;
+import org.firstinspires.ftc.teamcode.hw.Lift;
 import org.firstinspires.ftc.teamcode.hw.MyIMU;
 import org.firstinspires.ftc.teamcode.pathmaker.GameSetup;
 import org.firstinspires.ftc.teamcode.pathmaker.PathDetails;
@@ -43,7 +43,7 @@ public class Auto_Robot2 extends LinearOpMode {
     public static int runTest_ms = 100;
     public static int thisNumberSteps = 2;
     public static int setZone = 1;
-    public static GameSetup.Terminal terminal = GameSetup.Terminal.CLOSE;
+    public static GameSetup.Terminal terminal = GameSetup.Terminal.FAR;
 
     DriveTrain driveTrain = new DriveTrain(this);
 
@@ -57,18 +57,15 @@ public class Auto_Robot2 extends LinearOpMode {
 
         Lift lift = new Lift(hardwareMap.get(DcMotor.class, "leftLift"),
                 hardwareMap.get(DcMotor.class, "rightLift"),
-                hardwareMap.get(TouchSensor.class, "bottomSwitch"),
                 hardwareMap.get(DcMotor.class, "bucket"),
+                hardwareMap.get(TouchSensor.class, "bottomSwitch"),
+                hardwareMap.get(TouchSensor.class, "slideSwitch"),
                 telemetry);
 
-        Intake intake = new Intake(hardwareMap.get(CRServo.class, "intakeLift"),
+        Intake intake = new Intake(hardwareMap.get(DcMotor.class, "intakeLift"),
                 hardwareMap.get(CRServo.class, "spinner"),
                 hardwareMap.get(TouchSensor.class, "upStop"),
                 hardwareMap.get(TouchSensor.class, "bottomStop"),
-                hardwareMap.get(Servo.class, "topLeftExtender"),
-                hardwareMap.get(Servo.class, "topRightExtender"),
-                hardwareMap.get(Servo.class, "bottomLeftExtender"),
-                hardwareMap.get(Servo.class, "bottomRightExtender"),
                 telemetry);
 
         RobotPose.initializePose(this, driveTrain, telemetry);

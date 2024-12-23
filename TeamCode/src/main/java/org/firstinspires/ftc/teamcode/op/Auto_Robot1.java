@@ -22,8 +22,8 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.components.Intake;
-import org.firstinspires.ftc.teamcode.components.Lift;
+import org.firstinspires.ftc.teamcode.hw.Intake;
+import org.firstinspires.ftc.teamcode.hw.Lift;
 import org.firstinspires.ftc.teamcode.hw.MyIMU;
 import org.firstinspires.ftc.teamcode.pathmaker.GameSetup;
 import org.firstinspires.ftc.teamcode.pathmaker.PathDetails;
@@ -51,28 +51,26 @@ public class Auto_Robot1 extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-
+            GameSetup.terminal = GameSetup.Terminal.CLOSE;
+            terminal = GameSetup.Terminal.CLOSE;
 
 
 
         Lift lift = new Lift(hardwareMap.get(DcMotor.class, "leftLift"),
                 hardwareMap.get(DcMotor.class, "rightLift"),
-                hardwareMap.get(TouchSensor.class, "bottomSwitch"),
                 hardwareMap.get(DcMotor.class, "bucket"),
+                hardwareMap.get(TouchSensor.class, "bottomSwitch"),
+                hardwareMap.get(TouchSensor.class, "slideSwitch"),
                 telemetry);
 
-        Intake intake = new Intake(hardwareMap.get(CRServo.class, "intakeLift"),
+        Intake intake = new Intake(hardwareMap.get(DcMotor.class, "intakeLift"),
                 hardwareMap.get(CRServo.class, "spinner"),
                 hardwareMap.get(TouchSensor.class, "upStop"),
                 hardwareMap.get(TouchSensor.class, "bottomStop"),
-                hardwareMap.get(Servo.class, "topLeftExtender"),
-                hardwareMap.get(Servo.class, "topRightExtender"),
-                hardwareMap.get(Servo.class, "bottomLeftExtender"),
-                hardwareMap.get(Servo.class, "bottomRightExtender"),
                 telemetry);
 
         RobotPose.initializePose(this, driveTrain, telemetry);
-            RobotPose.setPose(63, -36, 270);
+            RobotPose.setPose(63, -35, 270);
 
         MyIMU.init(this);
         MyIMU.updateTelemetry(telemetry);
@@ -110,6 +108,7 @@ public class Auto_Robot1 extends LinearOpMode {
                             PathMakerStateMachine.aprilTagDetectionOn, PathMakerStateMachine.aprilTagDetectionID, PathManager.inTargetZone, RobotPose.isRobotAtRest()));
                     telemetry.addLine(String.format("PathDetails.elapsedTime_ms %.1f", PathDetails.elapsedTime_ms.milliseconds()));
                     telemetry.addLine(String.format("ave/PM/DT cycle %d /  %d (ms) / %.3f (s)", (int) t1, PathManager.PMcycleTime_ms, RobotPose.DT_seconds));
+
                     double [] xya = RobotPose.tagOffset(PathMakerStateMachine.aprilTagDetectionID);
                     telemetry.addLine(String.format("delta-is-should f/s/a %.1f / %.1f / %.1f",
                             PathManager.deltaIsShouldY,
@@ -145,6 +144,26 @@ public class Auto_Robot1 extends LinearOpMode {
                             RobotPose.getYVelocity_inPerSec(),
                             RobotPose.getHeadingVelocity_degPerSec(),
                             PathManager.v_ramp));
+
+
+
+
+                    telemetry.addData("chassis at right spot: ", PathManager.inTargetZone);
+                    telemetry.addData("Lift at target position: ", lift.liftAtTargetPosition);
+                    telemetry.addData("Lift at target position: ", lift.slideAtTargetPosition);
+                    telemetry.addData("intake at target position: ", intake.intakeAtTargetPosition);
+                    telemetry.addData("Target slide position", PathDetails.slidePosition);
+                    telemetry.addData("Target slide power", PathDetails.slidePower);
+                    telemetry.addData("slide position", Lift.slidePosition);
+                    telemetry.addData("Slide target position", Lift.slideTargetPosition);
+                    telemetry.addData("Slide power", Lift.slidePower);
+                    telemetry.addData("Lift encoder value", Lift.leftLift.getCurrentPosition());
+                    telemetry.addData("Lift power", Lift.liftPower);
+                    telemetry.addData("Lift target position", Lift.liftTargetPosition);
+                    telemetry.addData("Lift distance to target", lift.getLiftDistanceToTarget());
+                    telemetry.addData("Control mode", PathMakerStateMachine.control_mode);
+                    telemetry.addData("Elapsed path time", PathDetails.elapsedTime_ms.milliseconds());
+
 
                     MyIMU.updateTelemetry(telemetry);
                     telemetry.update();
