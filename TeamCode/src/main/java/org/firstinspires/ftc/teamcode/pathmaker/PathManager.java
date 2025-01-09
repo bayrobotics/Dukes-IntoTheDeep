@@ -108,9 +108,9 @@ public class PathManager {
             Thread.sleep(timeStep_ms-PMcycleTime_ms);
         }
     }
-    private static boolean checkInTargetZone() {
+    public static boolean checkInTargetZone() {
         // latch until inTargetZone is reset in setPath
-        if (inTargetZone == true) return true;
+//        if (inTargetZone == true) return true;
         // check if robot is in target zone
         if (Math.abs(deltaIsShouldY) < yTargetZone_in &&
                 Math.abs(deltaIsShouldX) < xTargetZone_in &&

@@ -160,7 +160,7 @@ public class PathDetails {
                 PathManager.yRampReach_in = 4;
                 PathManager.xRampReach_in = 4;
                 PathManager.turnRampReach_deg = 90;
-                intakePower = 0.5;
+                intakePower = 0.3;
                 powerScaling = 0.5;
                 intakePosition = IntakePosition.UP;
                 xFieldGoal_in = 58; yFieldGoal_in = -58; aFieldGoal_deg = 315;
@@ -176,7 +176,7 @@ public class PathDetails {
                 slidePower = 0.6;
                 powerScaling = 0;
                 liftPower = 1;
-                intakePower = 0.5;
+                intakePower = 0.3;
                 slideFieldDelay_ms = 1500;
                 liftFieldDelay_ms = 0;
                 xFieldDelay_ms = 6000;
@@ -192,18 +192,19 @@ public class PathDetails {
                // calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
             case MOVE_TO_FAR_SAMPLE:
-                pathTime_ms = 6000;
+                pathTime_ms = 7000;
                 PathManager.yRampReach_in = 4;
                 PathManager.xRampReach_in = 4;
                 PathManager.turnRampReach_deg = 30;
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.AUTO_ExecutePath;
                 intakePosition = IntakePosition.DOWN;
+                liftPower = 0.3;
                 spinPower = -1;
                 intakePower = 0.04;
                 powerScaling = 0.4;
                 // intakeFieldDelay_ms = 500;
-                xFieldDelay_ms = 2000;
+                xFieldDelay_ms = 3000;
                 xFieldGoal_in = 43; yFieldGoal_in = -48; aFieldGoal_deg = 270;
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;

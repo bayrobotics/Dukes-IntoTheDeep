@@ -50,6 +50,7 @@ public class Auto_Robot1 extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        telemetry = FtcDashboard.getInstance().getTelemetry();
 
             GameSetup.terminal = GameSetup.Terminal.CLOSE;
             terminal = GameSetup.Terminal.CLOSE;
@@ -148,7 +149,7 @@ public class Auto_Robot1 extends LinearOpMode {
 
 
 
-                    telemetry.addData("chassis at right spot: ", PathManager.inTargetZone);
+                    telemetry.addData("chassis at right spot: ", PathManager.checkInTargetZone());
                     telemetry.addData("Lift at target position: ", lift.liftAtTargetPosition);
                     telemetry.addData("Lift at target position: ", lift.slideAtTargetPosition);
                     telemetry.addData("intake at target position: ", intake.intakeAtTargetPosition);
