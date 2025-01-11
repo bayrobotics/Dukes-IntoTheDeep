@@ -216,7 +216,7 @@ public class Lift extends RobotComponent {
 
 
     public int getLiftDistanceToTarget() {
-        return Math.abs(leftLift.getCurrentPosition()- leftLift.getTargetPosition());
+        return Math.abs(leftLift.getCurrentPosition() - leftLift.getTargetPosition());
     }
 
     public int getSlideDistanceToTarget() {
