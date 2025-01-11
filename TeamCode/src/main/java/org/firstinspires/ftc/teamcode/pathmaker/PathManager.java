@@ -48,7 +48,7 @@ public class PathManager {
     public static double xRampReach_in = 12;
     public static double turnRampReach_deg = 45;
     public static double waitBeforeRamp_ms = 300;
-    public static double xTargetZone_in = 1, yTargetZone_in = 1, turnTargetZone_deg = 10;
+    public static double xTargetZone_in = 1.0, yTargetZone_in = 1.0, turnTargetZone_deg = 10.0;
     public static double xMinVelocity_InchPerSec = 5, yMinVelocity_InchPerSec = 5, turnMinVelocity_degPerSec = 5, v_ramp = 1;
     public static double minPower, xMinPower = 0.2, yMinPower = 0.2, turnMinPower = 0.2;
     public static double powerScalingXY = 1, powerScalingTurn = 1, powerScaling;
@@ -112,12 +112,13 @@ public class PathManager {
         // latch until inTargetZone is reset in setPath
 //        if (inTargetZone == true) return true;
         // check if robot is in target zone
-        if (Math.abs(deltaIsShouldY) < yTargetZone_in &&
-                Math.abs(deltaIsShouldX) < xTargetZone_in &&
-                Math.abs(deltaIsShouldAngle) < turnTargetZone_deg) {
+        if ((Math.abs(deltaIsShouldY) < yTargetZone_in) &&
+                (Math.abs(deltaIsShouldX) < xTargetZone_in) &&
+                (Math.abs(deltaIsShouldAngle) < turnTargetZone_deg)) {
             inTargetZone = true;
-        } else
+        } else {
             inTargetZone = false;
+        }
         return inTargetZone;
     }
     private static void balancePower() {

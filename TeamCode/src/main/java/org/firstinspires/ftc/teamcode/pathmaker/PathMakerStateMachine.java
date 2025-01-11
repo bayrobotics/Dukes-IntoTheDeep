@@ -212,7 +212,6 @@ public class PathMakerStateMachine {
                     intake.setSpinnerPower(spinPower);
                     PathManager.moveRobot();
 
-
                     if(PathDetails.autoPathList.get(currentPath) == PathDetails.Path.DEPOSIT_SAMPLE) {
                         powerDown();
                     }

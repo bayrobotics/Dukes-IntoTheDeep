@@ -115,6 +115,10 @@ public class Auto_Robot1 extends LinearOpMode {
                             PathManager.deltaIsShouldY,
                             PathManager.deltaIsShouldX,
                             PathManager.deltaIsShouldAngle));
+                    telemetry.addLine(String.format("target zone f/s/a %.1f / %.1f / %.1f",
+                            PathManager.xTargetZone_in,
+                            PathManager.yTargetZone_in,
+                            PathManager.turnTargetZone_deg));
                     telemetry.addLine(String.format("delta is-should signum f/s/a %d / %d / %d",
                             (int) Math.signum(PathManager.deltaIsShouldY),
                             (int) Math.signum(PathManager.deltaIsShouldX),
@@ -149,19 +153,21 @@ public class Auto_Robot1 extends LinearOpMode {
 
 
 
-                    telemetry.addData("chassis at right spot: ", PathManager.checkInTargetZone());
+
+
+                    telemetry.addData("chassis at right spot: ", PathManager.inTargetZone);
                     telemetry.addData("Lift at target position: ", lift.liftAtTargetPosition);
                     telemetry.addData("Lift at target position: ", lift.slideAtTargetPosition);
-                    telemetry.addData("intake at target position: ", intake.intakeAtTargetPosition);
+                    // telemetry.addData("intake at target position: ", intake.intakeAtTargetPosition);
                     telemetry.addData("Target slide position", PathDetails.slidePosition);
-                    telemetry.addData("Target slide power", PathDetails.slidePower);
+                    // telemetry.addData("Target slide power", PathDetails.slidePower);
                     telemetry.addData("slide position", Lift.slidePosition);
-                    telemetry.addData("Slide target position", Lift.slideTargetPosition);
-                    telemetry.addData("Slide power", Lift.slidePower);
+                    // telemetry.addData("Slide target position", Lift.slideTargetPosition);
                     telemetry.addData("Lift encoder value", Lift.leftLift.getCurrentPosition());
                     telemetry.addData("Lift power", Lift.liftPower);
                     telemetry.addData("Lift target position", Lift.liftTargetPosition);
                     telemetry.addData("Lift distance to target", lift.getLiftDistanceToTarget());
+                    telemetry.addData("Slide encoder value", lift.getSlideEncoderValue());
                     telemetry.addData("Control mode", PathMakerStateMachine.control_mode);
                     telemetry.addData("Elapsed path time", PathDetails.elapsedTime_ms.milliseconds());
 
