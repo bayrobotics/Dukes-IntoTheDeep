@@ -179,6 +179,10 @@ public class PathMakerStateMachine {
                 break;
             case DONE:
                 powerDown();
+                intake.moveIntakeTo(Intake.IntakePosition.UP, 0);
+                lift.moveLiftTo(Lift.LiftPosition.DOWN, 0);
+                lift.moveSlideTo(Lift.SlidePosition.DOWN, 0);
+                intake.setSpinnerPower(0);
                 break;
             default:
                 break;
@@ -209,12 +213,15 @@ public class PathMakerStateMachine {
                         intake.moveIntakeTo(intakePosition, 0);
                     }
 
-                    intake.setSpinnerPower(spinPower);
+                    intake.setSpinnerPower(-1);
                     PathManager.moveRobot();
 
+                    /*
                     if(PathDetails.autoPathList.get(currentPath) == PathDetails.Path.DEPOSIT_SAMPLE) {
                         powerDown();
                     }
+                    */
+
                 }
 
                 lift.updateLift();

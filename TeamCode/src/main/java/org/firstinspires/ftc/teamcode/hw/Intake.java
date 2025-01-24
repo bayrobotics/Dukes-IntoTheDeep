@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.hw;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
@@ -18,24 +19,34 @@ public class Intake extends RobotComponent {
     public IntakePosition intakeTargetPosition = IntakePosition.UP;
     public static double intakeLiftPower = 0;
     public static double spinnerPower = 0;
+    public static double intakeExtensionPower = 0;
     public boolean intakeAtTargetPosition = false;
     private DcMotor intakeLift;
     private CRServo spinner;
+    private CRServo leftExtender;
+    private CRServo rightExtender;
     private TouchSensor upStop;
     private TouchSensor bottomStop;
+    private TouchSensor retractStop;
+    private TouchSensor extendStop;
 
 
-    public Intake(DcMotor intakeLift, CRServo spinner, TouchSensor upStop, TouchSensor bottomStop, Telemetry telemetry) {
+    public Intake(DcMotor intakeLift, CRServo spinner, CRServo leftExtender, CRServo rightExtender, TouchSensor upStop, TouchSensor bottomStop, TouchSensor retractStop, TouchSensor extendStop, Telemetry telemetry) {
 
         this.intakeLift = intakeLift;
         this.spinner = spinner;
+        this.leftExtender = leftExtender;
+        this.rightExtender = rightExtender;
         this.upStop = upStop;
         this.bottomStop = bottomStop;
+        this.retractStop = retractStop;
+        this.extendStop = extendStop;
         this.telemetry = telemetry;
 
         intakeLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftExtender.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void updateState(Gamepad gamepad1, Gamepad gamepad2) {
@@ -57,7 +68,7 @@ public class Intake extends RobotComponent {
         if(gamepad1.a) {
             moveIntakeTo(IntakePosition.DOWN, 0.2);
         } else if (gamepad1.y) {
-            moveIntakeTo(IntakePosition.UP, 0.5);
+            moveIntakeTo(IntakePosition.UP, 0.7);
         } else if(!gamepad2.b) {
             setIntakeLiftPower(0);
         }
@@ -70,6 +81,15 @@ public class Intake extends RobotComponent {
             setSpinnerPower(0);
         }
 
+        if(gamepad2.y) {
+            extendIntake(1);
+        } else if(gamepad2.a) {
+            extendIntake(-1);
+            intakeLift.setPower(-0.1);
+        } else {
+            extendIntake(0);
+        }
+
 
         telemetry.addData("Intake position: ", intakePosition);
         telemetry.addData("Intake encoder value: ", intakeLift.getCurrentPosition());
@@ -78,6 +98,8 @@ public class Intake extends RobotComponent {
         telemetry.addData("Spinner power", spinnerPower);
         telemetry.addData("bottom stop pressed: ", bottomStop.isPressed());
         telemetry.addData("gamepad y", gamepad1.y);
+        telemetry.addData("retract stop pressed: ", retractStop.isPressed());
+        telemetry.addData("extend stop pressed: ", extendStop.isPressed());
 
     }
 
@@ -95,6 +117,14 @@ public class Intake extends RobotComponent {
             power = 0;
         } else if(intakeTargetPosition == IntakePosition.UP && upStop.isPressed()) {
             power = 0;
+        }
+
+        if(intakeLift.getCurrentPosition() > 150 && !bottomStop.isPressed() && 0 < power) {
+            power = -0.1;
+        }
+
+        if(intakeLift.getCurrentPosition() < 250 && power < -0.5) {
+            power = -0.45;
         }
 
         intakeLift.setPower(power);
@@ -130,6 +160,19 @@ public class Intake extends RobotComponent {
         }
 
         setIntakeLiftPower(power);
+    }
+
+    public void extendIntake(double power) {
+
+        if(power < 0 && retractStop.isPressed()) {
+            power = 0;
+        } else if(power > 0 && extendStop.isPressed()) {
+            power = 0;
+        }
+
+        leftExtender.setPower(power);
+        rightExtender.setPower(power);
+        intakeExtensionPower = power;
     }
 
     public void setSpinnerPower(double power) {

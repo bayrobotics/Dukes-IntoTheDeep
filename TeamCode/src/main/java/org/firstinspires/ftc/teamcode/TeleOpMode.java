@@ -28,8 +28,12 @@ public class TeleOpMode extends LinearOpMode {
 
         Intake intake = new Intake(hardwareMap.get(DcMotor.class, "intakeLift"),
                 hardwareMap.get(CRServo.class, "spinner"),
+                hardwareMap.get(CRServo.class, "leftExtender"),
+                hardwareMap.get(CRServo.class, "rightExtender"),
                 hardwareMap.get(TouchSensor.class, "upStop"),
                 hardwareMap.get(TouchSensor.class, "bottomStop"),
+                hardwareMap.get(TouchSensor.class, "retractStop"),
+                hardwareMap.get(TouchSensor.class, "extendStop"),
                 telemetry);
 
         Lift lift = new Lift(hardwareMap.get(DcMotor.class, "leftLift"),
