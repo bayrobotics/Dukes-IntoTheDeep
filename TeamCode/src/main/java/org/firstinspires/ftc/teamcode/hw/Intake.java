@@ -66,9 +66,9 @@ public class Intake extends RobotComponent {
         }
 
         if(gamepad1.a) {
-            moveIntakeTo(IntakePosition.DOWN, 0.2);
+            moveIntakeTo(IntakePosition.DOWN, 0.3);
         } else if (gamepad1.y) {
-            moveIntakeTo(IntakePosition.UP, 0.7);
+            moveIntakeTo(IntakePosition.UP, 0.6);
         } else if(!gamepad2.b) {
             setIntakeLiftPower(0);
         }
@@ -96,8 +96,10 @@ public class Intake extends RobotComponent {
         telemetry.addData("Intake at target position: ", intakeAtTargetPosition);
         telemetry.addData("Intake power: ", intakeLiftPower);
         telemetry.addData("Spinner power", spinnerPower);
-        telemetry.addData("bottom stop pressed: ", bottomStop.isPressed());
         telemetry.addData("gamepad y", gamepad1.y);
+        telemetry.addData("gamepad a", gamepad1.a);
+        telemetry.addData("up stop pressed: ", upStop.isPressed());
+        telemetry.addData("bottom stop pressed: ", bottomStop.isPressed());
         telemetry.addData("retract stop pressed: ", retractStop.isPressed());
         telemetry.addData("extend stop pressed: ", extendStop.isPressed());
 
@@ -105,26 +107,10 @@ public class Intake extends RobotComponent {
 
     private void setIntakeLiftPower(double power) {
 
-        double direction = Math.signum(power);
-
         if(upStop.isPressed() && power < 0) {
             power = 0;
         } else if(bottomStop.isPressed() && power > 0) {
             power = 0;
-        }
-
-        if(intakeTargetPosition == IntakePosition.DOWN && bottomStop.isPressed()) {
-            power = 0;
-        } else if(intakeTargetPosition == IntakePosition.UP && upStop.isPressed()) {
-            power = 0;
-        }
-
-        if(intakeLift.getCurrentPosition() > 150 && !bottomStop.isPressed() && 0 < power) {
-            power = -0.1;
-        }
-
-        if(intakeLift.getCurrentPosition() < 250 && power < -0.5) {
-            power = -0.45;
         }
 
         intakeLift.setPower(power);
@@ -133,30 +119,22 @@ public class Intake extends RobotComponent {
 
     public void moveIntakeTo(IntakePosition targetPosition, double power) {
 
-        switch(targetPosition) {
-            case DOWN:
-                intakeLift.setTargetPosition(5000); // 1000 is estimate
-                intakeTargetPosition = IntakePosition.DOWN;
-                break;
-            case UP:
-                intakeLift.setTargetPosition(0);
-                intakeTargetPosition = IntakePosition.UP;
-                break;
-            default:
-                intakeLift.setTargetPosition(intakeLift.getCurrentPosition());
-            break;
+        if(upStop.isPressed()) {
+            intakePosition = IntakePosition.UP;
+        } else if(bottomStop.isPressed()) {
+            intakePosition = IntakePosition.DOWN;
+        } else {
+            intakePosition = IntakePosition.MOVING;
         }
 
-        if (intakeLift.getCurrentPosition() > intakeLift.getTargetPosition()) {
+        if (intakePosition != IntakePosition.UP && targetPosition == IntakePosition.UP) {
             power *= -1;
         }
 
-        if((intakeTargetPosition == IntakePosition.DOWN && bottomStop.isPressed()) || (intakeTargetPosition == IntakePosition.UP && upStop.isPressed()) || (intakeLift.getCurrentPosition() < 10 && targetPosition == IntakePosition.UP))  {
-            intakeAtTargetPosition = true;
-            intakePosition = targetPosition;
-        } else {
-            intakeAtTargetPosition = false;
-            intakePosition = IntakePosition.MOVING;
+        if(intakePosition == IntakePosition.UP && power < 0) {
+            power = 0;
+        } else if(intakePosition == IntakePosition.DOWN && power > 0) {
+            power = 0;
         }
 
         setIntakeLiftPower(power);

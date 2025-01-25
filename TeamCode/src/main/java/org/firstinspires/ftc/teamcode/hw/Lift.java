@@ -87,6 +87,10 @@ public class Lift extends RobotComponent {
             moveSlideTo(SlidePosition.DOWN, gamepad2.right_stick_y * 0.6);
         }
 
+        if(gamepad2.right_stick_button) {
+            moveSlideTo(SlidePosition.INTAKE, 0.5);
+        }
+
         telemetry.addData("Lift position", liftPosition);
         telemetry.addData("Lift target position", liftTargetPosition);
         telemetry.addData("Lift encoder value", liftEncoderValue);
@@ -99,7 +103,7 @@ public class Lift extends RobotComponent {
         telemetry.addData("slide target position", slideTargetPosition);
         telemetry.addData("Slide at target position", slideAtTargetPosition);
         telemetry.addData("Slide power", slidePower);
-        telemetry.addData("slide distance to target", getSlideDistanceToTarget());
+        // telemetry.addData("slide distance to target", getSlideDistanceToTarget());
 
         updateLift();
     }
