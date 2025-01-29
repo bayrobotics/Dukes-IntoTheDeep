@@ -179,7 +179,7 @@ public class PathMakerStateMachine {
                 break;
             case DONE:
                 powerDown();
-                intake.moveIntakeTo(Intake.IntakePosition.UP, 0);
+                intake.moveIntakeTo(Intake.IntakePosition.DOWN, 0);
                 lift.moveLiftTo(Lift.LiftPosition.DOWN, 0);
                 lift.moveSlideTo(Lift.SlidePosition.DOWN, 0);
                 intake.setSpinnerPower(0);

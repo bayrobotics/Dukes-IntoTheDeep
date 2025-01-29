@@ -114,7 +114,7 @@ public class Lift extends RobotComponent {
 
         if(getLiftDistanceToTarget() < 10) {
             power = 0;
-        } else if (getLiftDistanceToTarget() < 250) {
+        } else if (getLiftDistanceToTarget() < 300) {
             power *= 0.4;
         }
 
@@ -162,8 +162,8 @@ public class Lift extends RobotComponent {
 
         if(getSlideDistanceToTarget() < 20) {
             power = 0;
-        } else if(getSlideDistanceToTarget() < 300) {
-            power *= getSlideDistanceToTarget() / 1000.0;
+        } else if(getSlideDistanceToTarget() < 500) {
+            power *= getSlideDistanceToTarget() / 700.0;
             if(Math.abs(power) < 0.2) {power = 0.2 * direction;}
         }
 
@@ -180,8 +180,8 @@ public class Lift extends RobotComponent {
                 slideTargetPosition = 0;
                 break;
             case INTAKE:
-                slide.setTargetPosition(185);
-                slideTargetPosition = 185;
+                slide.setTargetPosition(260);
+                slideTargetPosition = 260;
                 break;
             case ASCENT:
                 slide.setTargetPosition(700); // 700 is estimate

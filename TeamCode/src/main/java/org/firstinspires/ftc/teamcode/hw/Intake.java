@@ -83,11 +83,8 @@ public class Intake extends RobotComponent {
 
         if(gamepad2.y) {
             extendIntake(1);
-        } else if(gamepad2.a) {
-            extendIntake(-1);
-            intakeLift.setPower(-0.1);
         } else {
-            extendIntake(0);
+            extendIntake(-1);
         }
 
 
