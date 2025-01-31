@@ -65,7 +65,7 @@ public class Lift extends RobotComponent {
         if(gamepad2.b) {
             leftLift.setPower(-0.8);
             rightLift.setPower(-0.8);
-            slide.setPower(-0.3);
+            slide.setPower(-0.7);
         }
 
         if(gamepad2.x) {
@@ -82,7 +82,7 @@ public class Lift extends RobotComponent {
         }
 
         if(gamepad2.right_stick_y < 0) {
-            moveSlideTo(SlidePosition.BASKET, -gamepad2.right_stick_y * 0.6);
+            moveSlideTo(SlidePosition.BASKET, -gamepad2.right_stick_y * 0.7);
         } else if(gamepad2.right_stick_y >= 0 && !gamepad2.b) {
             moveSlideTo(SlidePosition.DOWN, gamepad2.right_stick_y * 0.6);
         }

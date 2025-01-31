@@ -51,14 +51,6 @@ public class Intake extends RobotComponent {
 
     public void updateState(Gamepad gamepad1, Gamepad gamepad2) {
 
-        if(gamepad2.b) {
-            intakeLift.setPower(-1);
-        }
-
-        if(gamepad2.x) {
-            intakeLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            intakeLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        }
 
         if(upStop.isPressed()) {
             intakeLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

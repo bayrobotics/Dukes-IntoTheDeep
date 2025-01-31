@@ -177,21 +177,21 @@ public class PathDetails {
             case DEPOSIT_SAMPLE:
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.AUTO_ExecutePath;
-                pathTime_ms = 3000;
-                slideFieldDelay_ms = 1600;
+                pathTime_ms = 3500;
+                slideFieldDelay_ms = 1900;
                 liftFieldDelay_ms = 800;
                 turnFieldDelay_ms = 400;
-                PathManager.yRampReach_in = 6;
-                PathManager.xRampReach_in = 6;
-                PathManager.turnRampReach_deg = 30;
+                PathManager.yRampReach_in = 7;
+                PathManager.xRampReach_in = 7;
+                PathManager.turnRampReach_deg = 45;
                 powerScaling = 0.6;
-                liftPower = 1;
-                slidePower = 0.7;
+                liftPower = 0.9;
+                slidePower = 0.8;
                 intakePower = 0.4;
                 liftPosition = LiftPosition.HIGH_BASKET;
                 slidePosition = Lift.SlidePosition.BASKET;
                 intakePosition = Intake.IntakePosition.DOWN;
-                xFieldGoal_in = 57; yFieldGoal_in = -57; aFieldGoal_deg = 315;
+                xFieldGoal_in = 58; yFieldGoal_in = -58; aFieldGoal_deg = 315;
                 calculateInitialPowerSignum(xFieldGoal_in, yFieldGoal_in, aFieldGoal_deg);
                 break;
             case DROP_LIFT:
@@ -254,10 +254,11 @@ public class PathDetails {
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.AUTO_ExecutePath;
                 pathTime_ms = 2200;
                 liftFieldDelay_ms = 500;
+                xFieldDelay_ms = 200;
                 PathManager.yRampReach_in = 6;
                 PathManager.xRampReach_in = 6;
                 PathManager.turnRampReach_deg = 60;
-                powerScaling = 0.7;
+                powerScaling = 0.6;
                 intakePower = 0.4;
                 liftPower = 0.8;
                 slidePower = 0.4;
@@ -271,7 +272,7 @@ public class PathDetails {
             case INTAKE_CLOSE_SAMPLE:
             PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
             PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.AUTO_ExecutePath;
-            pathTime_ms = 3500;
+            pathTime_ms = 2800;
             xFieldDelay_ms = 1000;
             yFieldDelay_ms = 500;
             liftFieldDelay_ms = 500;
@@ -301,10 +302,13 @@ public class PathDetails {
             case TRANSFER:
                 PathMakerStateMachine.control_mode = PathMakerStateMachine.CONTROL_MODE.AUTONOMOUS;
                 PathMakerStateMachine.pm_state = PathMakerStateMachine.PM_STATE.AUTO_ExecutePath;
-                pathTime_ms = 1500;
+                pathTime_ms = 1800;
+                xFieldDelay_ms = 2000;
+                yFieldDelay_ms = 2000;
+                turnFieldDelay_ms = 2000;
                 intakeFieldDelay_ms = 500;
                 powerScaling = 0.4;
-                intakePower = 0.7;
+                intakePower = 0.8;
                 slidePower = 0.4;
                 slidePosition = Lift.SlidePosition.INTAKE;
                 intakePosition = Intake.IntakePosition.UP;
