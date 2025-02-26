@@ -55,9 +55,8 @@ public class Auto_Robot2 extends LinearOpMode {
         terminal = GameSetup.Terminal.FAR;
 
 
-        Lift lift = new Lift(hardwareMap.get(DcMotor.class, "leftLift"),
-                hardwareMap.get(DcMotor.class, "rightLift"),
-                hardwareMap.get(DcMotor.class, "bucket"),
+        Lift lift = new Lift(hardwareMap.get(DcMotor.class, "rightLift"),
+                hardwareMap.get(Servo.class, "bucket"),
                 hardwareMap.get(TouchSensor.class, "bottomSwitch"),
                 hardwareMap.get(TouchSensor.class, "slideSwitch"),
                 telemetry);

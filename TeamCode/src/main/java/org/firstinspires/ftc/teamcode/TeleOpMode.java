@@ -4,9 +4,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.hw.Chassis;
+import org.firstinspires.ftc.teamcode.hw.HangSystem;
 import org.firstinspires.ftc.teamcode.hw.Intake;
 import org.firstinspires.ftc.teamcode.hw.Lift;
 import org.firstinspires.ftc.teamcode.hw.RobotComponent;
@@ -36,17 +38,21 @@ public class TeleOpMode extends LinearOpMode {
                 hardwareMap.get(TouchSensor.class, "extendStop"),
                 telemetry);
 
-        Lift lift = new Lift(hardwareMap.get(DcMotor.class, "leftLift"),
-        hardwareMap.get(DcMotor.class, "rightLift"),
-                hardwareMap.get(DcMotor.class, "bucket"),
+        Lift lift = new Lift(hardwareMap.get(DcMotor.class, "rightLift"),
+                hardwareMap.get(Servo.class, "bucket"),
                 hardwareMap.get(TouchSensor.class, "bottomSwitch"),
                 hardwareMap.get(TouchSensor.class, "slideSwitch"),
+                telemetry);
+
+        HangSystem hangSystem = new HangSystem(hardwareMap.get(DcMotor.class, "hanger"),
                 telemetry);
 
         List<RobotComponent> components = new LinkedList<RobotComponent>();
         components.add(chassis);
         components.add(intake);
         components.add(lift);
+        components.add(hangSystem);
+
 
         waitForStart();
 

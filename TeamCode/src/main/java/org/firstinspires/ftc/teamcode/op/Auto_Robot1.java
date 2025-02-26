@@ -57,9 +57,8 @@ public class Auto_Robot1 extends LinearOpMode {
 
 
 
-        Lift lift = new Lift(hardwareMap.get(DcMotor.class, "leftLift"),
-                hardwareMap.get(DcMotor.class, "rightLift"),
-                hardwareMap.get(DcMotor.class, "bucket"),
+        Lift lift = new Lift(hardwareMap.get(DcMotor.class, "rightLift"),
+                hardwareMap.get(Servo.class, "bucket"),
                 hardwareMap.get(TouchSensor.class, "bottomSwitch"),
                 hardwareMap.get(TouchSensor.class, "slideSwitch"),
                 telemetry);
@@ -167,11 +166,8 @@ public class Auto_Robot1 extends LinearOpMode {
                     // telemetry.addData("Target slide power", PathDetails.slidePower);
                     telemetry.addData("slide position", Lift.slidePosition);
                     // telemetry.addData("Slide target position", Lift.slideTargetPosition);
-                    telemetry.addData("Lift encoder value", Lift.leftLift.getCurrentPosition());
                     telemetry.addData("Lift power", Lift.liftPower);
                     telemetry.addData("Lift target position", Lift.liftTargetPosition);
-                    telemetry.addData("Lift distance to target", lift.getLiftDistanceToTarget());
-                    telemetry.addData("Slide encoder value", lift.getSlideEncoderValue());
                     telemetry.addData("Control mode", PathMakerStateMachine.control_mode);
                     telemetry.addData("Elapsed path time", PathDetails.elapsedTime_ms.milliseconds());
 

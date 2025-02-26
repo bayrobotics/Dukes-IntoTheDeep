@@ -14,9 +14,14 @@ public class Intake extends RobotComponent {
         DOWN, UP, MOVING
     }
 
+    public enum IntakeExtension {
+        RETRACTED, EXTENDED, MOVING
+    }
+
     public Telemetry telemetry;
     public static IntakePosition intakePosition = IntakePosition.UP;
     public IntakePosition intakeTargetPosition = IntakePosition.UP;
+    public IntakeExtension intakeExtension = IntakeExtension.RETRACTED;
     public static double intakeLiftPower = 0;
     public static double spinnerPower = 0;
     public static double intakeExtensionPower = 0;
@@ -51,6 +56,11 @@ public class Intake extends RobotComponent {
 
     public void updateState(Gamepad gamepad1, Gamepad gamepad2) {
 
+        if(bottomStop.isPressed()) {
+            intakePosition = IntakePosition.DOWN;
+        } else {
+            intakePosition = IntakePosition.UP;
+        }
 
         if(upStop.isPressed()) {
             intakeLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -74,9 +84,9 @@ public class Intake extends RobotComponent {
         }
 
         if(gamepad2.y) {
-            extendIntake(1);
+            extendIntake(IntakeExtension.EXTENDED, 1);
         } else {
-            extendIntake(-1);
+            extendIntake(IntakeExtension.RETRACTED, 1);
         }
 
 
@@ -85,12 +95,12 @@ public class Intake extends RobotComponent {
         telemetry.addData("Intake at target position: ", intakeAtTargetPosition);
         telemetry.addData("Intake power: ", intakeLiftPower);
         telemetry.addData("Spinner power", spinnerPower);
-        telemetry.addData("gamepad y", gamepad1.y);
-        telemetry.addData("gamepad a", gamepad1.a);
         telemetry.addData("up stop pressed: ", upStop.isPressed());
         telemetry.addData("bottom stop pressed: ", bottomStop.isPressed());
         telemetry.addData("retract stop pressed: ", retractStop.isPressed());
         telemetry.addData("extend stop pressed: ", extendStop.isPressed());
+        telemetry.addData("intake extension position", intakeExtension);
+        telemetry.addData("gamepad 2 y", gamepad2.left_stick_y);
 
     }
 
@@ -116,7 +126,7 @@ public class Intake extends RobotComponent {
             intakePosition = IntakePosition.MOVING;
         }
 
-        if (intakePosition != IntakePosition.UP && targetPosition == IntakePosition.UP) {
+        if (targetPosition == IntakePosition.UP) {
             power *= -1;
         }
 
@@ -129,12 +139,24 @@ public class Intake extends RobotComponent {
         setIntakeLiftPower(power);
     }
 
-    public void extendIntake(double power) {
+    public void extendIntake(IntakeExtension position, double power) {
+
+        if(position == IntakeExtension.RETRACTED) {
+            power *= -1;
+        }
 
         if(power < 0 && retractStop.isPressed()) {
             power = 0;
         } else if(power > 0 && extendStop.isPressed()) {
             power = 0;
+        }
+
+        if(retractStop.isPressed()) {
+            intakeExtension = IntakeExtension.RETRACTED;
+        } else if(extendStop.isPressed()) {
+            intakeExtension = IntakeExtension.EXTENDED;
+        } else {
+            intakeExtension = IntakeExtension.MOVING;
         }
 
         leftExtender.setPower(power);
@@ -147,8 +169,8 @@ public class Intake extends RobotComponent {
         spinnerPower = power;
     }
 
-    private int getIntakeDistanceToTarget() {
-        return Math.abs(intakeLift.getCurrentPosition() - intakeLift.getTargetPosition());
+    public static IntakePosition getIntakePosition() {
+        return intakePosition;
     }
 
 }

@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.pathmaker;
 
+import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.extensionFieldDelay_ms;
+import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.intakeExtension;
+import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.intakeExtensionPower;
 import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.intakeFieldDelay_ms;
 import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.intakePosition;
 import static org.firstinspires.ftc.teamcode.pathmaker.PathDetails.intakePower;
@@ -180,9 +183,10 @@ public class PathMakerStateMachine {
             case DONE:
                 powerDown();
                 intake.moveIntakeTo(Intake.IntakePosition.DOWN, 0);
-                lift.moveLiftTo(Lift.LiftPosition.DOWN, 0);
-                lift.moveSlideTo(Lift.SlidePosition.DOWN, 0);
+                lift.moveLift(Lift.LiftPosition.DOWN, 0);
+                // lift.moveSlideTo(Lift.SlidePosition.DOWN, 0);
                 intake.setSpinnerPower(0);
+                intake.extendIntake(Intake.IntakeExtension.RETRACTED, 0);
                 break;
             default:
                 break;
@@ -196,21 +200,25 @@ public class PathMakerStateMachine {
                         pm_state = PM_STATE.AUTO_NEXT_PATH;
                 } else {
                     if(PathDetails.elapsedTime_ms.milliseconds() > liftFieldDelay_ms) {
-                        lift.moveLiftTo(PathDetails.liftPosition, liftPower);
+                        lift.moveLift(PathDetails.liftPosition, liftPower);
                     } else {
-                        lift.moveLiftTo(PathDetails.liftPosition, 0);
+                        lift.moveLift(PathDetails.liftPosition, 0);
                     }
 
                     if(PathDetails.elapsedTime_ms.milliseconds() > slideFieldDelay_ms) {
-                        lift.moveSlideTo(slidePosition, slidePower);
-                    } else {
-                        lift.moveSlideTo(slidePosition, 0);
+                       lift.moveSlideTo(slidePosition);
                     }
 
                     if(PathDetails.elapsedTime_ms.milliseconds() > intakeFieldDelay_ms) {
                         intake.moveIntakeTo(intakePosition, intakePower);
                     } else {
                         intake.moveIntakeTo(intakePosition, 0);
+                    }
+
+                    if(PathDetails.elapsedTime_ms.milliseconds() > extensionFieldDelay_ms) {
+                        intake.extendIntake(intakeExtension, intakeExtensionPower);
+                    } else {
+                        intake.extendIntake(intakeExtension, 0);
                     }
 
                     intake.setSpinnerPower(-1);
